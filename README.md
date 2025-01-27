@@ -1,1 +1,1 @@
-# SCSA_Algo
+# Algo
