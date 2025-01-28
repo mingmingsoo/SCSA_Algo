@@ -1,30 +1,39 @@
 T = int(input())
-
-
-def count(grid):
-    ret = 0
-    for row in grid:
-        cnt = 0
-        for n in row:
-            if n == 1:
-                cnt+=1
-            else:
-                if cnt == k:
-                    ret +=1
-                cnt = 0
-    return ret
-
-
 for tc in range(T):
     n, k = map(int, input().split())
-    grid = [[0]*(n+2)]+ [[0]+list(map(int, input().split()))+[0] for i in range(n)]+[[0]*(n+2)]
-    for row in grid:
-        print(*row)
-    # grid_t = list(zip(*grid))
-    grid_t = list(map(list, zip(*grid)))
-    # print(grid_t)
-    print(count(grid))
-    print(count(grid_t))
-    ans = count(grid) + count(grid_t)
+    grid = [list(map(int, input().split())) for i in range(n)]
+    ans = 0
 
+    row = [1, 0]
+    col = [0, 1]
+
+
+    def check(r, c):
+        sum = 0
+        for d in range(2):
+            isOk = True
+            for l in range(1, k):
+                nr = r + row[d] * l
+                nc = c + col[d] * l
+                if (not (0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 1)):
+                    isOk = False
+                    break
+
+            if (0 <= r + row[d] * (k) < n and 0 <= c + col[d] * (k) < n and grid[r + row[d] * (k)][
+                c + col[d] * (k)] == 1):
+                isOk = False
+            if (0 <= r + row[d] * (-1) < n and 0 <= c + col[d] * (-1) < n and grid[r + row[d] * (-1)][
+                c + col[d] * (-1)] == 1):
+                isOk = False
+
+            if (isOk):
+                # print(r, c, d, sum)
+                sum += 1
+        return sum
+
+
+    for i in range(n):
+        for j in range(n):
+            if (grid[i][j] == 1):
+                ans += check(i, j)
     print(f"#{tc+1} {ans}")
