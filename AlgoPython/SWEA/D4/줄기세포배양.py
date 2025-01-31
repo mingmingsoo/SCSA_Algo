@@ -26,7 +26,7 @@ for i in range(startX,endX):
     for j in range(startY, endY):
         grid[i][j] = tmp[j-startY]
         if(grid[i][j]>0):
-            q.append((i,j,grid[i][j],0))
+            q.append((i,j,grid[i][j],0,0)) # 위치, 생명력, 활성화되기전 시간, 활성화 되고나서 얼마나 지났는가
 row = [-1,1,0,0]
 col = [0,0,1,-1]
 limit = 0
@@ -40,9 +40,10 @@ while q:
         c = node[1]
         time = node[2]
         curTime = node[3]
+        dieTime = node[4]
 
         if(curTime<time):
-            q.append((r,c,time,curTime+1)) # 시간이 안지났으면 대기
+            q.append((r,c,time,curTime+1,dieTime)) # 시간이 안지났으면 대기
         elif(curTime==time): # 시간이 지났으면 확장 가능
             # 확장하는 로직
             for d in range(4):
