@@ -1,21 +1,29 @@
-from collections import deque
-mod = 10000
-start, end = map(int, input().split())
+T = int(input())
+for tc in range(T):
+    from collections import deque
 
-q = deque((start,end))
-visited = [0]*mod
-visited[start] = 1
+    mod = 10000
+    start, end = map(int, input().split())
 
-while q:
-    now = q.popleft()
-    strNow = f"{str(now):4}"
-    
-
-    if(visited[(2*now)%10000]==0):
-        q.append((2*now)%10000)
-    if(visited[(now-1)%10000]==0):
-        q.append((now-1)%10000)
-    if (True):
-        q.append((2 * now) % 10000)
-    if (True):
-        q.append((2 * now) % 10000)
+    q = deque([(start, "")])
+    visited = [False] * mod
+    while q:
+        cur, ans = q.popleft()
+        if (cur == end):
+            print(ans)
+            break
+        curStr = str(f"{cur:04}")
+        leftStr = int(curStr[1:] + curStr[0])
+        rightStr = int(curStr[-1] + curStr[:3])
+        if (not visited[(2 * cur) % 10000]):
+            q.append(((2 * cur) % 10000, ans + "D"))
+            visited[(2 * cur) % 10000] = True
+        if (not visited[(cur - 1) % 10000]):
+            q.append(((cur - 1) % 10000, ans + "S"))
+            visited[(cur - 1) % 10000] = True
+        if (not visited[leftStr]):
+            q.append((leftStr, ans + "L"))
+            visited[leftStr] = True
+        if (not visited[rightStr]):
+            q.append((rightStr, ans + "R"))
+            visited[rightStr] = True
