@@ -3,11 +3,11 @@
 단 x+y가 작아야함.
 '''
 num = int(input())
-ans = 1001
-for i in range(num):
-    for j in range(num):
+ans = float("inf")
+for i in range(num//3+1):
+    for j in range(num//5+1):
         if(3*i+5*j == num):
             ans = min(ans, i+j)
-if(ans == 1001):
+if(ans == float("inf")):
     ans = -1
 print(ans)
