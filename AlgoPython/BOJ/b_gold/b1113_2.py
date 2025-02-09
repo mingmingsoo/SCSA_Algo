@@ -25,17 +25,6 @@ q에 값들이 잘 담긴채로 끝나면 물이 고일 수 있다.
     물이 고일 수 있었다면 걔네들만 visited 해주장. 그리고 그 set으로 높이 계산하자
     -> 고일수 있는 높이 계산하는 로직도 필요.
 
-반례
-
-5 6
-999999
-981787
-981787
-981787
-999999
-
-정답 24 인데 21나옴
-
 '''
 import copy
 from collections import deque
@@ -43,8 +32,6 @@ from collections import deque
 n,m = map(int, input().split())
 
 grid = [list(map(int, input())) for i in range(n)]
-
-pool_visited = [[False]* m for _ in range(n)]
 
 ans = 0
 
@@ -58,27 +45,24 @@ def bfs(i, j, height):
     minH = 10
     while q:
         r,c,h = q.popleft()
+
         for k in range(4):
             nr = r+row[k]
             nc = c+col[k]
             if(not(0<=nr<n and 0<=nc<m)): # 물이 될 수 없는 애들임.
                 return # 그냥 종료
-            if(not pool_visited[nr][nc] and (nr,nc,grid[nr][nc]) not in visited and grid[nr][nc]<=height): # 나보다 같거나 낮은 애들은 다 물이 흘러가유
+            if((nr,nc,grid[nr][nc]) not in visited and grid[nr][nc]<=height): # 나보다 같거나 낮은 애들은 다 물이 흘러가유
                 q.append((nr,nc,grid[nr][nc]))
                 visited.add((nr,nc,grid[nr][nc]))
-            if(height<grid[nr][nc]):
+            if(grid[nr][nc]>height):
                 minH = min(minH, grid[nr][nc])
-    print(visited)
-    if(minH==10):
-        return
-    print(minH)
-    for r,c,h in visited:
-        pool_visited[r][c] = True
-        ans += (minH-h)
-        grid[r][c] = minH
 
-for i in range(n):
-    for j in range(m):
-        if(not pool_visited[i][j]):
-            bfs(i,j,grid[i][j])
+    # 여기까지 왔으면 수영장 계산
+    for r,c,h in visited:
+        grid[r][c] = minH
+        ans += (minH-h)
+
+for i in range(1,n-1):
+    for j in range(1,m-1):
+        bfs(i,j,grid[i][j])
 print(ans)
