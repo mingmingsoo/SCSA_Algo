@@ -12,21 +12,18 @@ for tc in range(T):
     sr, sc = map(lambda x: int(x) - 1, input().split())
 
     visited = [[False] * m for i in range(n)]
-    sick = 1
-
-
+    ans = 0
     def bfs(sr, sc):
-
-        global sick
-        q = deque([(sr, sc)])
+        global ans
+        q = deque([(sr, sc,1)])
         visited[sr][sc] = True
 
         row = [-1, 1, 0, 0]
         col = [0, 0, 1, -1]
 
         while q:
-            r, c = q.popleft()
-
+            r, c, day = q.popleft()
+            ans = max(ans, day)
             for k in range(4):
                 nr = r + row[k]
                 nc = c + col[k]
@@ -34,9 +31,7 @@ for tc in range(T):
                     continue
                 if (not visited[nr][nc] and grid[nr][nc] == 1):
                     visited[nr][nc] = True
-                    q.append((nr, nc))
-                    sick += 1
-
+                    q.append((nr, nc,day+1))
 
     bfs(sr, sc)
     not_sick = 0
@@ -44,4 +39,4 @@ for tc in range(T):
         for j in range(m):
             if (grid[i][j] == 1 and not visited[i][j]):
                 not_sick += 1
-    print(f"#{tc+1} {sick} {not_sick}")
+    print(f"#{tc+1} {ans} {not_sick}")
