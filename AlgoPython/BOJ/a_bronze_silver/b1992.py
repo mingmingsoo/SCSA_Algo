@@ -1,21 +1,35 @@
 '''
 분할정복
-4씩 나눠들어가서 계산 수행....
-
-
-괄호처리를 어떻게 할지가 고민이네
+size//2
 
 '''
 
-n = int(input())
-grid = [list(map(int, input())) for i in range(n)]
-print(grid)
+size = int(input())
+grid = [list(map(int, input())) for i in range(size)]
+
+ans = []
+
+def valid(size, sr, sc):
+    start_num = grid[sr][sc]
+    for i in range(sr,sr+size):
+        for j in range(sc,sc+size):
+            if(grid[i][j]!=start_num):
+                return 2
+    else:
+        return start_num
+def mypow(size, sr, sc):
+    num = valid(size,sr,sc)
+    if(num==2):
+        ans.append("(")
+        mypow(size//2,sr,sc)
+        mypow(size//2,sr,sc+size//2)
+        mypow(size//2,sr+size//2,sc)
+        mypow(size//2,sr+size//2,sc+size//2)
+        ans.append(")")
+    else:
+        ans.append(num)
 
 
-def mypow(n, c):
+mypow(size,0,0) # size, start, end
 
-
-
-
-
-mypow(4,0) #  탈출조건은 0이 n의 제곱이 될떄까지인가?
+print("".join(map(str,ans)))
