@@ -8,23 +8,22 @@
     5점 이상의 경우의 수
 '''
 solve = list(map(int,input().split()))
-ans = 0
 sel = [0]*10
-def btk(idx, after, cnt):
+ans = 0
+def btk(idx): # cnt가 연속된 갯수, last_num 마지막 수
     global ans
-    if(idx ==10):
-        score = 0
-        print(sel)
+    if(idx==10):
+        total = 0
         for i in range(10):
             if(solve[i]==sel[i]):
-                score+=1
-        if(score>=5):
+                total+=1
+        if(total>=5):
             ans+=1
         return
     for i in range(1,6):
+        if(idx>1 and sel[idx-1] == sel[idx-2]==i):
+            continue
         sel[idx] = i
-        btk(idx+1, after, cnt+1)
-
-
-btk(0,0,0,0)
+        btk(idx+1)
+btk(0)
 print(ans)
