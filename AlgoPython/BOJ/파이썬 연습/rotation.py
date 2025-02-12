@@ -38,25 +38,30 @@
 #     print(grid[_])
 
 
-######### 메서드 만들어보기
+# ######### 메서드 만들어보기
+#
+# startR, startC, size = 1,1,3
+# n = 5
+# grid = [list(range(i,i+5)) for i in range(1,n*n+1,n)]
+#
+# for _ in range(n):
+#     print(grid[_])
+# print()
+# def rotation(grid, startR, startC, size):
+#     gridCopy = [row[startC: startC+size] for row in grid[startR:startR+size]]
+#     # gridCopy = list(map(list,zip(*gridCopy[::-1])))
+#     gridCopy = list(map(list, zip(*gridCopy)))[::-1]
+#     for i in range(startR, startR+size):
+#         for j in range(startC, startC+size):
+#             grid[i][j] = gridCopy[i-startR][j-startC]
+#
+# rotation(grid, startR, startC, size)
+#
+#
+# for _ in range(n):
+#     print(grid[_])
 
-startR, startC, size = 1,1,3
-n = 5
-grid = [list(range(i,i+5)) for i in range(1,n*n+1,n)]
+grid = [[2,5],[3,2]]
+grid.sort(key=lambda x:(x[1],x[0]))
 
-for _ in range(n):
-    print(grid[_])
-print()
-def rotation(grid, startR, startC, size):
-    gridCopy = [row[startC: startC+size] for row in grid[startR:startR+size]]
-    # gridCopy = list(map(list,zip(*gridCopy[::-1])))
-    gridCopy = list(map(list, zip(*gridCopy)))[::-1]
-    for i in range(startR, startR+size):
-        for j in range(startC, startC+size):
-            grid[i][j] = gridCopy[i-startR][j-startC]
-
-rotation(grid, startR, startC, size)
-
-
-for _ in range(n):
-    print(grid[_])
+print(grid)
