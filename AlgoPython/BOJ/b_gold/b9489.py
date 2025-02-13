@@ -8,6 +8,7 @@ while True:
     size = max(arr)
     # size = 40
     adj = [[] for i in range(size + 1)]
+    parent_map = {} # 각 노드들의 부모 저장.
     myparent = 0
     i = 0
     visited = [False] * (size + 1)
@@ -34,21 +35,18 @@ while True:
             if (visited[arr[j]]):
                 continue
             adj[parent].append(arr[j])
+            parent_map[arr[j]] = parent
             if (arr[j] == m):
                 myparent = parent
             visited[arr[j]] = True
         i += 1
     cousin = 0
     # 사촌 찾기
-    def findUncle():
-        global cousin
-        for node in adj:
-            if myparent in node:
-                for uncle in node:
-                    if (uncle == myparent):
-                        continue
-                    cousin += len(adj[uncle])
-                return
-
-    findUncle()
+    # print(parent_map)
+    # print(myparent)
+    if myparent in parent_map:
+        grandparent = parent_map[myparent]
+        for uncle in adj[grandparent]:
+            if(uncle!=myparent):
+                cousin+=len(adj[uncle])
     print(cousin)
