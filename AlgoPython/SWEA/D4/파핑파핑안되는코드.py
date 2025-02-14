@@ -23,48 +23,54 @@ def count_pang(r, c):  # 주변에 몇개의 지뢰가 있는지 세주는 함�
 
 
 def bfs(i, j):
+    global cnt
     q = deque([(i, j)])
 
     while q:
+        cnt += 1
         r, c = q.popleft()
         for k in range(8):
             nr = r + row[k]
             nc = c + col[k]
             if (not (0 <= nr < n and 0 <= nc < n)):
                 continue
-            if (grid[nr][nc]=="." and info[nr][nc] != 0 and not visited[nr][nc]):
-                visited[nr][nc] = True
-            elif (grid[nr][nc]=="." and info[nr][nc] == 0 and not visited[nr][nc]):
-                visited[nr][nc] = True
-                q.append((nr,nc))
+            if(info[nr][nc]==-1):
+                continue
+            if(info[nr][nc] != 0):
+                info[nr][nc] = -1
+            elif (info[nr][nc] == 0):
+                info[nr][nc] = -1
+                q.append((nr, nc))
+
 
 T = int(input())
 for tc in range(T):
 
     n = int(input())
     grid = [list(input()) for i in range(n)]
-    info = [[-1] * n for i in range(n)]
+    info = [[0] * n for i in range(n)]
     row = [1, -1, 0, 0, 1, 1, -1, -1]
     col = [0, 0, 1, -1, 1, -1, 1, -1]
 
     ans = 0
     for i in range(n):
         for j in range(n):
-            if grid[i][j] =="." and count_pang(i, j)==0:
-                info[i][j] = 0
-
-    visited = [[False]*n for i in range(n)]
+            if (grid[i][j] == "*"):
+                info[i][j] = -1
+            else:
+                info[i][j] = count_pang(i, j)
+    cnt = 0
     for i in range(n):
         for j in range(n):
-            if (info[i][j] == 0 and not visited[i][j]):  # 0인 애들만 담는다.
-                visited[i][j]=True
-                bfs(i, j)
+            if (info[i][j] == 0):  # 0인 애들만 담는다.
+                bfs(i, j)  # info를 다 -1 로 만들어버려
                 ans += 1
 
     # info 가 -1이 아닌애들 세주기 (== 0에 의해 못터진 애들)
     for i in range(n):
         for j in range(n):
-            if grid[i][j]=="." and not visited[i][j]:
+            if info[i][j] != -1:
                 ans += 1
 
     print(f"#{tc + 1} {ans}")
+    print(cnt)
