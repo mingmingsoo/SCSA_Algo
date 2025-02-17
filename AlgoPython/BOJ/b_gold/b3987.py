@@ -35,7 +35,6 @@ def tracking(r, c, d, time, sd):
     global dir, max_time, cycle
 
     while True:
-        visited.add((r,c,d))
         nr = r + row[d]
         nc = c + col[d]
         # 범위 벗어나면 끝
@@ -53,7 +52,7 @@ def tracking(r, c, d, time, sd):
             return
 
         # 시작 위치 만나면 사이클 끝
-        if (nr,nc,d) in visited:
+        if nr == sr and nc == sc and d == sd:
             cycle = True
             dir = "URDL"[sd]
             return
@@ -83,9 +82,7 @@ def tracking(r, c, d, time, sd):
         time += 1
 
 
-visited = [[[False] * 4 for i in range(m)] for i in range(n)]
 for i in range(4):
-    visited = set()
     tracking(sr, sc, i, 1, i)
     if (cycle):
         print(dir)
