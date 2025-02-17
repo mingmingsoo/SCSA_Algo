@@ -14,28 +14,25 @@
     최대힙으로 풀 수 있을까?
 '''
 from collections import deque
-def bfs(start, s): # 시작점0과 초기사이즈 1
-    global ans
-    q = deque([(start, s, 0)])  # 위치, 크기, 시간
-    while q:
-        qsize = len(q)
-        for i in range(qsize):
-            cur, size, time = q.popleft()
-            ans = max(ans, size)
 
-            if (time >= limit): # 시간이 끝났으면 q에 그만담아!!!!!!!!
-                continue
-            if (cur + 1 <= n):
-                q.append((cur + 1, size + arr[cur + 1], time + 1))
-            if (cur + 2 <= n):
-                q.append((cur + 2, size // 2 + arr[cur + 2], time + 1))
+
+def dfs(idx, sm, time):  # 시작점0과 초기사이즈 1
+    global ans
+    if (idx == n or time == limit):
+        ans = max(ans, sm)
+        return
+
+    if (idx + 1 <= n):
+        dfs(idx + 1, sm + arr[idx + 1], time + 1)
+    if (idx + 2 <= n):
+        dfs(idx + 2, sm // 2 + arr[idx + 2], time + 1)
+
 
 T = int(input())
 for tc in range(T):
-
     n, limit = map(int, input().split())
     arr = list(map(int, input().split()))
     arr.insert(0, 0)
     ans = 0  # 초기값.....
-    bfs(0, 1)
-    print(f"#{tc+1} {ans}")
+    dfs(0, 1, 0)
+    print(f"#{tc + 1} {ans}")
