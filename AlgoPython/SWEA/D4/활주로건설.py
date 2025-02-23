@@ -31,15 +31,6 @@ for tc in range(T):
     grid = [list(map(int, input().split())) for i in range(n)]
 
 
-    def same_first(arr):
-
-        first = arr[0]
-        for i in range(1, n):
-            if arr[i] != first:
-                return False
-        return True
-
-
     def valid(arr):
 
         # 1. 내 높이와 연속된 길이를 기록
@@ -81,17 +72,13 @@ for tc in range(T):
 
     ans = 0
     for row in grid:
-        if (same_first(row)):
-            ans += 1
-        elif (valid(row)):
+        if (valid(row)):
             ans += 1
 
     for j in range(n):
         col = []
         for i in range(n):
             col.append(grid[i][j])
-        if (same_first(col)):
-            ans += 1
-        elif (valid(col)):
+        if (valid(col)):
             ans += 1
     print(f"#{tc + 1} {ans}")
