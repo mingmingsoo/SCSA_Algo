@@ -37,36 +37,35 @@ grid = [list(map(int, input().split())) for i in range(n)]
 target = list(map(int, input().split()))
 ans = 1000
 sel = [0] * n
+found = False
 
 
-def subset(idx):
-    global ans
-    if sel.count(1) > 7:
+def subset(idx, cnt, r, g, b):
+    global ans, found
+    if(n-idx+cnt<2):
         return
-    if idx == n:
-        if sel.count(1) < 2:
+    if cnt > 7:
+        return
+    if 2 <= cnt <= 7:
+
+        tmp_r = r // cnt
+        tmp_g = g // cnt
+        tmp_b = b // cnt
+
+        if (tmp_r == target[0] and tmp_g == target[1] and tmp_b == target[2]):
+            found = True
+            ans = 0
             return
-        r, g, b = 0, 0, 0
-        cnt = sel.count(1)  # 내가 선택한 물감 갯수
-        for i in range(n):
-            if (sel[i] == 1):
-                r += grid[i][0]
-                g += grid[i][1]
-                b += grid[i][2]
-        r //= cnt
-        g //= cnt
-        b //= cnt
-        # print(r,g,b)
-        diff_r, diff_g, diff_b = abs(target[0] - r), abs(target[1] - g), abs(target[2] - b)
-        diff = diff_r + diff_g + diff_b
-        ans = min(ans, diff)
+        else:
+            ans = min(ans, abs(target[0] - tmp_r) + abs(target[1] - tmp_g) + abs(target[2] - tmp_b))
+
+    if idx == n:
         return
+    # 골랐어
+    subset(idx + 1, cnt + 1, r + grid[idx][0], g + grid[idx][1], b + grid[idx][2])
+    # 안골랐어
+    subset(idx + 1, cnt, r, g, b)
 
-    sel[idx] = 1 # 이게 순서가 바뀌면 안되네...
-    subset(idx + 1)
-    sel[idx] = 0
-    subset(idx + 1)
 
-
-subset(0)
+subset(0, 0, 0, 0, 0)
 print(ans)
