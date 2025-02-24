@@ -7,44 +7,36 @@
      1. 같은 모양인지 검사.
      2. 최소 동전 갯수는 합쳤을 때 안 겹쳐지는 애들임
 
-     # 0이 시작되는 애들 정보를 담아..?
 '''
 
 n1, m1 = map(int, input().split())
-grid1= [list(input()) for i in range(n1)]
-
+grid1 = [list(input()) for i in range(n1)]
 
 n2, m2 = map(int, input().split())
-grid2= [list(input()) for i in range(n2)]
-
-def find(grid,n,m):
-    sx, sy = 11,11
-    ex, ey = -1,-1
-    for i in range(n):
-        for j in range(m):
-            if grid[i][j]== "O":
-                sx = min(sx,i)
-                sy = min(sy,i)
-                ex = max(ex,i)
-                ey = max(ey,i)
-    return sx,sy,ex,ey
-
-sr1,sc1,er1,ec1 = find(grid1,n1,m1)
-sr2,sc2,er2,ec2 = find(grid2,n2,m2)
-
-# 맵 축소과정
-arr1 = [[0]*(ec1-sc1+1) for i in range(er1-sr1+1)]
-arr2 = [[0]*(ec2-sc2+1) for i in range(er2-sr2+1)]
+grid2 = [list(input()) for i in range(n2)]
 
 
-for i in range(sr1,er1+1):
-    for j in range(sc1,ec1+1):
-        arr1[i][j] = grid1[i-sr1][j-sc1]
+# grid1을 고정시키겠음
+grid = [[0] * (m2 * 2 + m1) for i in range(n2 * 2 + n1)]
+for i in range(n2, n2 + n1):
+    for j in range(m2, m2 + m1):
+        if (grid1[i - n2][j - m2] == "O"):
+            grid[i][j] = -1
 
+coin = 100000000
+for i in range(0, n2 + n1 + 1):
+    for j in range(0, m2 + m1 + 1):
+        # print(i,j)
+        # 얘네가 grid2의 시작점
+        grid_copy = [_[:] for _ in grid]
+        for x in range(i, i + n2):
+            for y in range(j, j + m2):                # print(x,y)
+                if (grid2[x - i][y - j] == "O"):
+                    grid_copy[x][y] *= -1
 
-for i in range(sr2,er2+1):
-    for j in range(sc2,ec2+1):
-        arr2[i][j] = grid2[i-sr2][j-sc2]
+        ele_coin = 0
+        for row in grid_copy:
+            ele_coin += row.count(-1)
+        coin = min(ele_coin, coin)
 
-# 필요한 가로 길이
-
+print(coin)
