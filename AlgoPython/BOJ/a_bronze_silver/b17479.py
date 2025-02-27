@@ -6,25 +6,24 @@
                 & 오직 하나 가능
 
 '''
+import sys
+input = sys.stdin.readline
 
 a, b, c = map(int, input().split())
-A, B, C = dict(), dict(), set()
+A, B, C = {}, {}, set()
 for i in range(a):
-    menu, price = input().split()
-    price = int(price)
-    A[menu] = price
+    menu, price = input().rstrip().split()
+    A[menu] = int(price)
 for i in range(b):
-    menu, price = input().split()
-    price = int(price)
-    B[menu] = price
+    menu, price = input().rstrip().split()
+    B[menu] = int(price)
 for i in range(c):
-    menu = input()
-    C.add(menu)
+    C.add(input().rstrip())
 
 # print(A,B,C)
 
 order_num = int(input())
-order_list = [input() for i in range(order_num)]
+order_list = [input().rstrip() for i in range(order_num)]
 
 def isOk():
     # 특별 메뉴- 일반메뉴 총 이만 이상 가능
@@ -40,7 +39,7 @@ def isOk():
             A_price += A[menu]
         elif menu in B:
             B_price += B[menu]
-        elif menu in C:
+        else:
             C_count += 1
     # print(A_price, B_price, C_count)
     if(C_count>1):
