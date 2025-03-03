@@ -1,37 +1,29 @@
-import math
-
-# for i in range(3): # 1
-#     for j in range(3-i-1): # 0~2
-#         print(" ", end= "")
-#     for j in range(2*i+1): #0~3
-#         if (i % 2 == 1 and j % 2 == 1):
-#             print(" ", end="")
-#         else:
-#             print("*", end = "")
-#     print()
-#
+'''
+이젠 규칙까지 유추하라네
+'''
 n = int(input())
+arr = [[" "]*(n*2) for i in range(n)]
 
-stars = [[" "]* (2*n-1) for i in range(n)]
+def star(n,r,c):
+    if n == 3:
+        arr[r][c+2] = "*"
 
+        arr[r+1][c+1] = "*"
+        arr[r+1][c+3] = "*"
 
-def star(r, c, n):
-    if(n==3):
-        stars[r][c] = '*'
-        stars[r+1][c-1] = stars[r+1][c+1] = '*'
-        stars[r+2][c-2] =stars[r+2][c-1]=stars[r+2][c]=stars[r+2][c+1] = stars[r+2][c+2] = '*'
+        arr[r+2][c+0] = "*"
+        arr[r+2][c+1] = "*"
+        arr[r+2][c+2] = "*"
+        arr[r+2][c+3] = "*"
+        arr[r+2][c+4] = "*"
+
         return
-    else:
-        cut = n//2
-        star(r,c,cut)
-        star(r+cut, c-cut, cut)
-        star(r+cut, c+cut, cut)
+
+    star(n//2,r,c+n//2) # 위
+    star(n//2,r+n//2,c) # 아래 왼
+    star(n//2,r+n//2,c+n) # 아래 오
 
 
-star(0,n-1,n) # 꼭대기 별이 n-1 에 위치
-
-
-for i in range(n):
-    for j in range(2*n-1):
-        print(stars[i][j], end = "")
-    print()
+star(n,0,0)
+for _ in arr:
+    print("".join(_))
