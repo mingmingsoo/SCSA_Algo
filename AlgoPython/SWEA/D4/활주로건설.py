@@ -63,8 +63,8 @@ for tc in range(T):
                     if j >= n or arr[j] != small_h:  # 활주로 건설 불가
                         return False
                 i = i + x  # 다음칸으로 넘어가고
-                karo = 0  # 가로길이  초기화
-                h = arr[i - 1]  # 높이는 전 값으로.
+                karo = 1  # 가로길이  초기화
+                h = arr[i-1]  # 높이는 전 값으로.
             else:
                 return False
         return True
