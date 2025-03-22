@@ -1,66 +1,54 @@
-import math
-
 '''
-90도 회전이 아니라
-한칸 옮기는 것임.
-# 반시계 회전.
-rotation은 최소공배수..
+배열을 한칸씩 돌리는데
+mod 찾아내기
 
+한칸 흐어 흠 ㄹ남음낭ㅁㄴ어ㅏㅣㄴ
 
+도대체가 왜안되느지 모르겠네
+while 에서 for문으로 변경
 '''
-import copy
+import sys
 
-n, m, rotation = map(int, input().split())
+input = sys.stdin.readline
 
-
-orignin_n = n
-orignin_m = m
+n, m, rot = map(int, input().split())
 grid = [list(map(int, input().split())) for i in range(n)]
-ro_grid = [[0] * m for i in range(n)]
-row = [0, 1, 0, -1]
-col = [1, 0, -1, 0]
+r, c, N, M = 0, 0, n, m
 cnt = 0
 
-while cnt < rotation:
-    r, c = 0, 0
-    d = 0
-    start_r = 0
-    start_c = 0
-    n = orignin_n
-    m = orignin_m
-    while True:
-        if (r == orignin_n // 2 or c == orignin_m // 2):
-            break  # 회전 중지
+def rotate(grid, r, c, N, M):
+    global cnt
+    cnt+=1
+    mod = (N - r) * 2 + (M - c - 2) * 2
+    if mod == 0:
+        new_rot = 0
+    else:
+        new_rot = rot % mod
+    for idx in range(new_rot):
+        tmp = grid[r][c]
+        for j in range(c, M - 1):
+            grid[r][j] = grid[r][j + 1]
+        for i in range(r, N - 1):
+            grid[i][M - 1] = grid[i + 1][M - 1]
+        for j in range(M - 1, c, -1):
+            grid[N - 1][j] = grid[N - 1][j - 1]
+        for i in range(N - 1, r, -1):
+            grid[i][c] = grid[i - 1][c]
+        grid[r + 1][c] = tmp
 
-        while True:
-            if (ro_grid[r][c] != 0):
-                r += 1
-                c += 1
-                n -= 1
-                m -= 1
-                start_r += 1
-                start_c += 1
-                d = 0
-                break
 
-            nr = r + row[d]
-            nc = c + col[d]
-
-            if (start_r <= nr < n and start_c <= nc < m):
-                ro_grid[r][c] = grid[nr][nc]
-                r = nr
-                c = nc
-            else:
-                d = (d + 1) % 4
-    cnt += 1
-    grid = [_[:] for _ in ro_grid]
-    ro_grid = [[0] * orignin_m for i in range(orignin_n)]
+for i in range(min(m, n) // 2):
+    rotate(grid, r, c, N, M)
+    r += 1
+    c += 1
+    N -= 1
+    M -= 1
 for _ in grid:
     print(*_)
-
+print(cnt)
 # num = 1
 # for i in range(300):
-#     for j in range(300):
+#     for j in range(149):
 #         print(num, end = " ")
 #         num+=1
 #     print()
