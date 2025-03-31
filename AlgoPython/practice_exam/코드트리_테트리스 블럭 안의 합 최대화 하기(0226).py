@@ -1,6 +1,33 @@
 '''
+# 코드트리 테트리스 블럭 안의 합 최대화 하기(백준 14500 테트로미노)
+
 2025.03.28.금
 두번째 풀이(이지만 예전에 풀어봤어서 3번째 풀이)
+
+문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 20:13
+    문제 종료 20:26
+    총 풀이시간 13분
+        13~18   : dfs 설계(5)
+                    1.
+                    depth가 0부터 시작이라
+                        0 1 2 3
+                    ex) 1 2 3 4
+                    depth == 3일때 최댓값 갱신해줘야하는데 4일때 갱신해줘서 값이 크게 나와 수정!
+                    2.
+                    visited 어디서 처리해줘야 할지 확신이 안서서
+                    일단 안쓰고 디버거 돌려서 아 여기다 해줘야겠구나 하고
+                    visited 추가!
+        18~22   : dfs 로 안되는 ㅜ ㅏ ㅗ ㅓ 하드코딩
+        22~26   : 검증 ㅜ ㅏ ㅗ ㅓ 하나씩 테케 만들어서 검사!(4)
+                    휴~ 인덱스 에러 발견! 조건 수정
+                    n -> m 오타 수정
+
+    메모리 19 KB
+    시간 87 ms
+
+문제 풀면서의 기록
 dfs+하드코딩
 4 5
 0 0 0 0 0
@@ -82,13 +109,6 @@ for i in range(n):
         ans = max(ans, sm1, sm2)
 print(ans)
 
-
-
-
-
-
-
-
 '''
 
 # 코드트리 테트리스 블럭 안의 합 최대화 하기(백준 14500 테트로미노)
@@ -151,7 +171,9 @@ print(ans)
 1 1 1 1 1 1
 
 '''
-def dfs(r,c,depth,sm):
+
+
+def dfs(r, c, depth, sm):
     global ans
     if depth == 4:
         ans = max(ans, sm)
@@ -160,56 +182,55 @@ def dfs(r,c,depth,sm):
         return
 
     for k in range(4):
-        nr = r+row[k]
-        nc = c+col[k]
+        nr = r + row[k]
+        nc = c + col[k]
 
-        if not(0<=nr<n and 0<=nc<m) or visited[nr][nc]:
+        if not (0 <= nr < n and 0 <= nc < m) or visited[nr][nc]:
             continue
 
         visited[nr][nc] = True
-        dfs(nr,nc,depth+1,sm+grid[nr][nc])
+        dfs(nr, nc, depth + 1, sm + grid[nr][nc])
         visited[nr][nc] = False
 
 
-n,m = map(int, input().split())
+n, m = map(int, input().split())
 
 grid = [list(map(int, input().split())) for i in range(n)]
 
 ans = 0
 
-visited = [[False]*m for i in range(n)]
-row = [-1,1,0,0]
-col = [0,0,1,-1]
-
+visited = [[False] * m for i in range(n)]
+row = [-1, 1, 0, 0]
+col = [0, 0, 1, -1]
 
 for i in range(n):
     for j in range(m):
         visited[i][j] = True
-        dfs(i,j,1,grid[i][j]) # 위치와 depth, 합
+        dfs(i, j, 1, grid[i][j])  # 위치와 depth, 합
         visited[i][j] = False
 
 # ㅏ 모양
-for i in range(n-2):
-    for j in range(m-1):
-        ele_sum = grid[i][j]+grid[i+1][j]+grid[i+2][j]+grid[i+1][j+1]
+for i in range(n - 2):
+    for j in range(m - 1):
+        ele_sum = grid[i][j] + grid[i + 1][j] + grid[i + 2][j] + grid[i + 1][j + 1]
         ans = max(ans, ele_sum)
 
 # ㅓ 모양
-for i in range(n-2):
-    for j in range(1,m):
-        ele_sum = grid[i][j]+grid[i+1][j]+grid[i+2][j]+grid[i+1][j-1]
+for i in range(n - 2):
+    for j in range(1, m):
+        ele_sum = grid[i][j] + grid[i + 1][j] + grid[i + 2][j] + grid[i + 1][j - 1]
         ans = max(ans, ele_sum)
 
 # ㅜ 모양
-for i in range(n-1):
-    for j in range(1,m-1):
-        ele_sum = grid[i][j] + grid[i][j-1] + grid[i][j+1] + grid[i + 1][j]
+for i in range(n - 1):
+    for j in range(1, m - 1):
+        ele_sum = grid[i][j] + grid[i][j - 1] + grid[i][j + 1] + grid[i + 1][j]
         ans = max(ans, ele_sum)
 
 # ㅗ 모양
-for i in range(n-1):
-    for j in range(1,m-1):
-        ele_sum = grid[i][j] + grid[i+1][j-1] + grid[i+1][j] + grid[i + 1][j + 1]
+for i in range(n - 1):
+    for j in range(1, m - 1):
+        ele_sum = grid[i][j] + grid[i + 1][j - 1] + grid[i + 1][j] + grid[i + 1][j + 1]
         ans = max(ans, ele_sum)
 
 print(ans)

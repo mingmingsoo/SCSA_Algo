@@ -1,4 +1,65 @@
 '''
+시간복잡도
+100*100*100
+
+2차원 배열의 값은 100이 최대임
+
+틀린 이유 : 답이 0이 될 수 도 있음....
+    아 저번엔 답이 100일때를 생각 못햇는데 ^^//... 테케가 부족했던걸로
+
+list(map(list, zip(*grid))) <- 이렇게하면 list로 됨
+list(zip(*grid)) <- 이거는 튜플로...
+
+'''
+from collections import Counter
+
+er, ec, num = map(int, input().split())
+er -= 1
+ec -= 1
+grid = [list(map(int, input().split())) for i in range(3)]
+ans = -1
+
+
+def sort():
+    global grid
+    new_grid = []
+    max_len = 0
+    for row in grid:
+        cnt = Counter(row)
+        tmp = []
+        for k, v in cnt.items():
+            if k != 0:
+                tmp.append([k, v])
+        tmp.sort(key=lambda x: (x[1], x[0]))
+        new_row = []
+        for _ in tmp:
+            new_row.extend(_)
+        max_len = max(max_len, len(new_row))
+        new_grid.append(new_row)
+    for _ in new_grid:
+        if len(_) < max_len:
+            _.extend([0] * (max_len - len(_)))
+    grid = new_grid
+
+
+for t in range(0, 101):  # 100초까지 가능
+    if len(grid) > er and len(grid[0]) > ec and grid[er][ec] == num:
+        ans = t
+        break
+
+    if len(grid) >= len(grid[0]):
+        sort()
+
+    else:
+        grid = list(zip(*grid))
+        sort()
+        grid = list(zip(*grid))
+
+    grid = [_[:100] for _ in grid[:100]]
+print(ans)
+
+
+'''
 
 # 백준 17140 이차원 배열과 연산 (코드트리 격자 숫자 놀이)
 

@@ -1,7 +1,22 @@
 '''
+# 코드트리 방화벽 설치하기 (백준 14502 연구소)
+
 2025.03.28.금
 두번째 풀이(이지만 예전에 풀어봤어서 3번째 풀이)
+문제 풀고 나서 기록
 
+    문제 시작 20:42
+    문제 종료 20:51
+    총 풀이시간 9분
+        42~43   : 문제 이해 및문제 구상 및 초기 주석(1)
+        43~46   : combi 설계(3)
+        46~51   : bfs 설계(5)
+
+
+    메모리 25 MB
+    시간 314 ms
+
+문제 풀면서의 기록
 문제 설명
     기존에 설치되어 있는 방화벽 제외 3개 추가해서 설치한다.
     불이 퍼지는 영역이 최대일 때 그 크기는?
@@ -15,13 +30,13 @@ from collections import deque
 n, m = map(int, input().split())
 grid = [list(map(int, input().split())) for i in range(n)]
 arr = []
-origin_q = deque()
+two = []
 for i in range(n):
     for j in range(m):
         if grid[i][j] == 0:
             arr.append((i, j))
         elif grid[i][j] == 2:
-            origin_q.append((i, j))
+            two.append((i, j))
 sel = [0] * 3
 
 row = [-1, 1, 0, 0]
@@ -33,7 +48,7 @@ def combi(sidx, idx):
     global ans
     if sidx == 3:
         grid_simul = [_[:] for _ in grid]
-        q = origin_q.copy()
+        q = deque(two)
         for r, c in sel:
             grid_simul[r][c] = 1
         while q:

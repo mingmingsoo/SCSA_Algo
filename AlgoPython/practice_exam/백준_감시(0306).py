@@ -1,4 +1,167 @@
 '''
+# 코드트리 이상한체스
+2025.03.29.토
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 20:43
+    문제 종료 21:10
+
+    총 풀이시간 27분
+        43~46   : 문제 이해 및 초기 주석(3)
+        46~10   : 백트래킹 함수 설계(24)
+                  오픈테케 및 1,2,3,4,5 번말 방향 잘 보는지 확인!
+
+  메모리 17 MB
+  시간 70 ms
+
+# 문제 풀면서의 기록
+말들을 모두 arr 에 담고
+idx 로 모든 경우의 수를 탐색
+출력은 전체 맵 크기 - 갈수 있는 체스판의 최댓값
+'''
+
+n, m = map(int, input().split())
+grid = [list(map(int, input().split())) for i in range(n)]
+
+arr = []
+visited = [[0] * m for i in range(n)]
+for i in range(n):
+    for j in range(m):
+        if 0 < grid[i][j] < 6:
+            arr.append((i, j, grid[i][j]))
+        elif grid[i][j] == 6:
+            visited[i][j] = 1
+
+ans = 0
+
+
+def left(r, c, visited):
+    for j in range(c, -1, -1):
+        if grid[r][j] == 6:
+            break
+        visited[r][j] = 1
+
+def right(r, c, visited):
+    for j in range(c, m):
+        if grid[r][j] == 6:
+            break
+        visited[r][j] = 1
+
+
+def up(r, c, visited):
+    for i in range(r, -1, -1):
+        if grid[i][c]== 6:
+            break
+        visited[i][c] = 1
+
+
+def down(r, c, visited):
+    for i in range(r, n):
+        if grid[i][c]== 6:
+            break
+        visited[i][c] = 1
+
+
+def btk(idx):
+    global ans, visited
+    if idx == len(arr):
+        sm = sum(map(sum, visited))
+        ans = max(ans, sm)
+        return
+
+    r, c, shape = arr[idx]
+    visited_copy = [_[:] for _ in visited]
+    if shape == 1:
+        left(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        right(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        up(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        down(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+    elif shape == 2:
+        left(r, c, visited)
+        right(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        up(r, c, visited)
+        down(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+    elif shape == 3:
+        up(r, c, visited)
+        right(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        right(r, c, visited)
+        down(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        down(r, c, visited)
+        left(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        left(r, c, visited)
+        up(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+    elif shape == 4:
+        up(r, c, visited)
+        right(r, c, visited)
+        down(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        right(r, c, visited)
+        down(r, c, visited)
+        left(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        down(r, c, visited)
+        left(r, c, visited)
+        up(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+        left(r, c, visited)
+        up(r, c, visited)
+        right(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+    elif shape == 5:
+        left(r, c, visited)
+        right(r, c, visited)
+        up(r, c, visited)
+        down(r, c, visited)
+        btk(idx + 1)
+        visited = [_[:] for _ in visited_copy]
+
+
+btk(0)
+print(n * m - ans)
+
+
+
+'''
 # 두번째 풀이
     함수화
 

@@ -1,4 +1,85 @@
 '''
+# 코드트리 돌아가는 팔각의자
+2025.03.29.토
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 20:07
+    문제 종료
+
+    총 풀이시간 20분
+        07~12   : 문제 이해, 초기 주석(3)
+        34~39   : combi 설계(5)
+        39~45   : 절반만 돌게 (n)C(n//2) 계산 -> 사실 sel[0] != 0 return 과 같은 것.(6)
+        45~51   : 이중 포문 돌게해서 점수 계산 설계(6)
+
+  메모리 23 MB
+  시간 324 ms
+
+# 문제 풀면서의 기록
+시간복잡도
+명령수 50* 회전횟수 m 50* 인접찾기 n,m 50*50
+50^4
+'''
+from collections import deque
+
+n, m, order_num = map(int, input().split())
+grid = [deque(map(int, input().split())) for i in range(n)]
+
+for order in range(order_num):
+    x, d, ro = map(int, input().split())
+    if d == 0:
+        d = 1
+    else:
+        d = -1
+    ro *= d
+
+    for i in range(x - 1, n, x):  # 배수만..
+        grid[i].rotate(ro)
+
+
+    # 인접 찾기
+    is_close = False
+    close = [[0] * m for i in range(n)]
+    # 가로 찾자
+    for i in range(n):
+        for j in range(-1, m - 1, 1):
+            if grid[i][j] and grid[i][j] == grid[i][j + 1]:
+                close[i][j] = close[i][j + 1] = 1
+                is_close = True
+    # 세로 찾자
+    for j in range(m):
+        for i in range(n - 1):
+            if grid[i][j] and grid[i][j] == grid[i + 1][j]:
+                close[i][j] = close[i + 1][j] = 1
+                is_close = True
+
+    if is_close:
+        for i in range(n):
+            for j in range(m):
+                if close[i][j]:
+                    grid[i][j] = 0
+    else:
+        cnt = 0
+        sm = 0
+        for i in range(n):
+            for j in range(m):
+                if grid[i][j]:
+                    cnt += 1
+                    sm += grid[i][j]
+
+        for i in range(n):
+            for j in range(m):
+                if grid[i][j] and grid[i][j] > sm // cnt:
+                    grid[i][j] -= 1
+                elif grid[i][j] and grid[i][j] < sm // cnt:
+                    grid[i][j] += 1
+
+print(sum(map(sum, grid)))
+
+
+'''
 # 백준 17822 원판돌리기
 # 체감난이도 골4
 
