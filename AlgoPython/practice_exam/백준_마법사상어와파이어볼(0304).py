@@ -1,4 +1,100 @@
 '''
+# 0402 2회차 풀이
+# 코드트리 원자 충돌
+
+# 문제 풀고 나서 기록
+
+    제출횟수 2회(문제 이해를 잘 못했음..)
+    문제 시작 14:50
+    문제 종료 15:26
+    총 풀이시간 36분
+        50~54   : 문제 이해, 초기주석 및 문제 구상(4)
+        54~58   : 이동 로직
+        58~08   : 충돌 로직
+        08~26   : 틀린 테케 봐도 내 답이 맞는 것 같음..
+                    문제 다시 읽기 ->
+                    아 원자 그냥 4개 생성이고 흩뿌려주는 게 아님
+                    -> 수정!
+    메모리 24 KB
+    시간 148 ms
+
+    회고
+        1. 틀린이유 : 문제를 잘못 읽어서... 원자 충돌시 그 자리에 4개 생기는건데
+                    4개를 흩뿌려주는 줄 알았다......... 왜그래 김혜준;;;ㅜㅜㅠㅠ
+
+# 문제 풀면서의 기록
+실제 시험이다
+문제 설명
+    - 도넛
+    1. 원자 이동 -> new_grid 필요
+        방향 * 속력 만큼
+    2. 2개 이상 있는 칸 뿜빠이
+        [] 빈공간으로 만들어주고 대신
+        add_lst에 넣어줌
+    3. add_lst 추가.
+헷갈리는게 뿜빠이 될때도 속력만큼? -> 아니 뿜빠이일 때는 그 위치 그 대 로 야
+'''
+
+n, atom, time = map(int, input().split())
+grid = [[[] for i in range(n)] for i in range(n)]
+row = [-1, -1, 0, 1, 1, 1, 0, -1]
+col = [0, 1, 1, 1, 0, -1, -1, -1]
+for a in range(atom):
+    r, c, m, s, d = map(int, input().split())
+    grid[r - 1][c - 1].append((m, s, d))
+
+for t in range(time):
+    new_grid = [[[] for i in range(n)] for i in range(n)]
+
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j]:
+                for m, s, d in grid[i][j]:
+                    nr = (i + row[d] * s) % n
+                    nc = (j + col[d] * s) % n
+                    new_grid[nr][nc].append((m, s, d))
+
+    # 상하좌우 0 2 4 6
+    # 대각선   1 3 5 7
+    add_lst = []
+    for i in range(n):
+        for j in range(n):
+            if len(new_grid[i][j]) > 1:  # 찢어준다.
+                l = len(new_grid[i][j])
+                tm = ts = 0
+                d_lst = []
+                for m, s, d in new_grid[i][j]:
+                    tm += m
+                    ts += s
+                    d_lst.append(d)
+                new_grid[i][j] = []
+                tm //= 5
+                if tm == 0:
+                    continue
+                ts //= l
+                udlr = 0
+                for d in d_lst:
+                    if d in (0, 2, 4, 6):
+                        udlr += 1
+                if udlr == 0 or udlr == l:
+                    # 모두 상하좌우 혹은 모두 대각선
+                    for d in (0, 2, 4, 6):
+                        new_grid[i][j].append((tm, ts, d))
+                else:
+                    for d in (1, 3, 5, 7):
+                        new_grid[i][j].append((tm, ts, d))
+
+    grid = new_grid
+ans = 0
+for i in range(n):
+    for j in range(n):
+        if grid[i][j]:
+            for m, s, d in grid[i][j]:
+                ans += m
+
+print(ans)
+
+'''
 # 코드트리 원자 충돌 (백준 20056 마법사 상어와 파이어볼)
 
 # 문제 풀고 나서 기록

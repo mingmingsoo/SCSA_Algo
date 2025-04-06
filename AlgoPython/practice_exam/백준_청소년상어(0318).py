@@ -1,4 +1,129 @@
 '''
+# 코드트리 술래잡기 체스
+2025.03.31.월
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 20:56
+    문제 종료 21:51
+
+    총 풀이시간 55분
+        56~02   : 문제 이해, 손코딩(6)
+        02~06   : 입력받기(4)
+        06~08   : 술래 초기 위치, 방향 설정(2)
+        08~30   : 도둑들 이동 설계(22)
+                   도둑들이 문제 예시처럼 이동 안해서 디버깅
+                    -> 술래가 처음 잡아먹었을 때 thief_lst를 0으로 안바꿔줘서 그랬음
+        30~35   : 술래가 이동할 수 있는 3칸 좌표 만들기(5)
+        35~19   : 1번 테케 답이 안나옴! 디버깅(44)
+                    go 함수에서 pr = nr, pc = nc 갱신을 안해줌 수정!
+                    가려는 위치에 도둑들이 있어야만 append 해주는 걸로로 수정!
+
+                    답이 이번엔 엄청 크게나옴 ...
+                    print 찍어보니까 원상복구가 잘 안되는 것 같음
+                    thief_lst를 딥카피하는걸로 변경 -> 답 나온다!
+
+  메모리 18 MB
+  시간 73 ms
+
+  회고
+    1. 역시 백트레킹은 어렵다......................
+        deepcopy 안해서 답이 안나왔었음 -> 이 얘기 완진이 오빠가 했었떤 것 같은데 ㅋㅋㅋ
+
+    2. 도둑들 이동 로직이 부족했던 것 같음.... 3회차 풀기!!
+
+'''
+
+import copy
+
+n = 4
+grid = [[0] * n for i in range(n)]
+thief_lst = [0] * 17
+
+for i in range(n):
+    tmp = list(map(int, input().split()))
+    for j in range(0, 8, 2):
+        num, d = tmp[j], tmp[j + 1]
+        grid[i][j // 2] = num
+        thief_lst[num] = [i, j // 2, d - 1]
+ans = 0
+pr = pc = pd = 0  # 술래 위치, 방향
+ans += grid[pr][pc]
+pd = thief_lst[grid[pr][pc]][2]
+
+sm = ans
+thief_lst[grid[pr][pc]] = 0
+grid[pr][pc] = 0
+row = [-1, -1, 0, 1, 1, 1, 0, -1]
+col = [0, -1, -1, -1, 0, 1, 1, 1]
+
+
+def go(pr, pc, pd):
+    lo = []
+    for k in range(3):
+        nr = pr + row[pd]
+        nc = pc + col[pd]
+        if not (0 <= nr < n and 0 <= nc < n):
+            break
+        if grid[nr][nc]:
+            lo.append((nr, nc))
+        pr = nr
+        pc = nc
+    return lo
+
+
+def btk(pr, pc, pd, sm):
+    global ans, grid, thief_lst
+
+    for idx, thief in enumerate(thief_lst):
+        if thief == 0:
+            continue
+        r, c, d = thief_lst[idx]
+        for k in range(8):
+            nr = r + row[d]
+            nc = c + col[d]
+            if not (0 <= nr < n and 0 <= nc < n) or (nr, nc) == (pr, pc):
+                d = (d + 1) % 8
+            else:
+                break
+        nr = r + row[d]
+        nc = c + col[d]
+        oidx = grid[nr][nc]
+        grid[r][c], grid[nr][nc] = grid[nr][nc], grid[r][c]
+
+        thief_lst[idx][0] = nr
+        thief_lst[idx][1] = nc
+        thief_lst[idx][2] = d
+
+        if oidx:
+            thief_lst[oidx][0] = r
+            thief_lst[oidx][1] = c
+    # 이동
+    grid_origin = [_[:] for _ in grid]
+    thief_lst_origin = copy.deepcopy(thief_lst)
+
+    location = go(pr, pc, pd)
+    if not location:
+        ans = max(ans, sm)
+        return
+    else:
+        for r, c in location:
+            ele_sm = grid[r][c]
+            d = thief_lst[grid[r][c]][2]
+            thief_lst[grid[r][c]] = 0
+            grid[r][c] = 0
+
+            btk(r, c, d, sm + ele_sm)
+            grid = [_[:] for _ in grid_origin]
+            thief_lst = copy.deepcopy(thief_lst_origin)
+
+
+btk(pr, pc, pd, sm)
+print(ans)
+
+
+'''
 # 백준 19236 청소년상어
 # 체감난이도 객관적으로 골1인데 하 백트래킹 너무 어렵다 내 기준 플5
 

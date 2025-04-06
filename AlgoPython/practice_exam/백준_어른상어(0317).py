@@ -1,4 +1,122 @@
 '''
+# 코드트리 승자독식 모노폴리
+2025.03.31.월
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 21:57
+    문제 종료 22:33
+
+    총 풀이시간 36분
+        57~05   : 문제 이해, 입력받기(8)
+        05~13   : 냄새 풍기기, 이동하기 로직(8)
+        13~16   : 로직확인(3)
+                    한 번 이동했던 애가 또 이동함!
+                    visited 추가!
+        16~18   : 냄새 빼주기 로직 및 while True에서 for t in range(1,1000) 으로 변경! (2)
+        18~36   : 테케 답이 안나옴...(18)
+
+                    냄새가 음수가 되면 없애주는 걸로 수정!
+
+                    나보다 큰 애가 있어서 내가 없어지는 경우가 없어서 추가!
+
+                    방향 검사하고 바뀐 방향을 반영해주는 건 안했음 수정!
+
+                    원래는 번호가 겹칠 때 swap  하는걸로 짰는데 ,,, 그러면 안된다 큰애를 남기는걸로 변경!
+                    if grid[next_r][next_c][0] > grid[i][j][0]:
+                        grid[next_r][next_c] = grid[i][j]
+                        grid[i][j] = 0
+  메모리 22 MB
+  시간 179 ms
+
+  회고
+    1. 이런 이동 로직이 좀 부족한 것 같음 청소년 상어도 그렇고  디버깅을 많이해서 ...
+        3회차 진행하기.
+
+'''
+
+def end():
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] and grid[i][j][0] > 1:
+                return False
+    return True
+
+
+n, player_num, time = map(int, input().split())
+grid = [list(map(int, input().split())) for i in range(n)]
+area = [[0] * n for i in range(n)]
+tmp = list(map(int, input().split()))
+for i in range(n):
+    for j in range(n):
+        if grid[i][j]:
+            grid[i][j] = [grid[i][j], tmp[grid[i][j] - 1] - 1]
+pq = []
+for p in range(player_num):
+    pq_tmp = [list(map(lambda x: int(x) - 1, input().split())) for i in range(4)]
+    pq.append(pq_tmp)
+
+
+row = [-1, 1, 0, 0]
+col = [0, 0, -1, 1]
+ans = -1
+for t in range(1, 1000):
+    # 냄새 남기기
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j]:
+                area[i][j] = [grid[i][j][0], time]
+
+    # 이동하기.
+    visited = [False] * (player_num + 1)
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] and not visited[grid[i][j][0]]:
+                visited[grid[i][j][0]] = True
+                empty = False
+                next_r, next_c, next_d = i, j, grid[i][j][1]
+                for k in pq[grid[i][j][0] - 1][grid[i][j][1]]:
+                    nr = i + row[k]
+                    nc = j + col[k]
+                    if 0 <= nr < n and 0 <= nc < n and area[nr][nc] == 0:
+                        empty = True
+                        next_r, next_c, next_d = nr, nc, k
+                        break
+                if not empty:
+                    for k in pq[grid[i][j][0] - 1][grid[i][j][1]]:
+                        nr = i + row[k]
+                        nc = j + col[k]
+                        if 0 <= nr < n and 0 <= nc < n and area[nr][nc][0] == grid[i][j][0]:
+                            next_r, next_c, next_d = nr, nc, k
+                            break
+                grid[i][j][1] = next_d
+                if grid[next_r][next_c] == 0:
+                    grid[next_r][next_c], grid[i][j] = grid[i][j], grid[next_r][next_c]
+                else:
+                    if grid[next_r][next_c][0] > grid[i][j][0]:
+                        grid[next_r][next_c] = grid[i][j]
+                        grid[i][j] = 0
+                    else:
+                        grid[i][j] = 0  # die
+
+    if end():
+        ans = t
+        break
+
+    # 냄새 빼주기
+    for i in range(n):
+        for j in range(n):
+            if area[i][j]:
+                area[i][j][1] -= 1
+                if area[i][j][1] <= 0:
+                    area[i][j] = 0
+
+print(ans)
+
+
+
+'''
 # 백준 19237 어른상어
 # 체감난이도 골1 (문제 이해가 어려웠음...)
 

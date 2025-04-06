@@ -1,6 +1,106 @@
+T = int(input())
+
+
+def rotation(idx):
+    face_ro = [_[:] for _ in cube[idx]]
+    for i in range(3):
+        for j in range(3):
+            cube[idx][i][j] = face_ro[2 - j][i]
+
+
+def up():
+    rotation(0)
+    f1, f2, f3 = cube[2][0][0], cube[2][0][1], cube[2][0][2]
+    cube[2][0][0], cube[2][0][1], cube[2][0][2] = cube[5][0][0], cube[5][0][1], cube[5][0][2]  # 오
+    cube[5][0][0], cube[5][0][1], cube[5][0][2] = cube[3][0][0], cube[3][0][1], cube[3][0][2]  # 뒤
+    cube[3][0][0], cube[3][0][1], cube[3][0][2] = cube[4][0][0], cube[4][0][1], cube[4][0][2]  # 왼
+    cube[4][0][0], cube[4][0][1], cube[4][0][2] = f1, f2, f3
+
+
+def down():
+    rotation(1)
+    f1, f2, f3 = cube[2][2][0], cube[2][2][1], cube[2][2][2]
+    cube[2][2][0], cube[2][2][1], cube[2][2][2] = cube[4][2][0], cube[4][2][1], cube[4][2][2]  # 왼
+    cube[4][2][0], cube[4][2][1], cube[4][2][2] = cube[3][2][0], cube[3][2][1], cube[3][2][2]  # 뒤
+    cube[3][2][0], cube[3][2][1], cube[3][2][2] = cube[5][2][0], cube[5][2][1], cube[5][2][2]  # 오
+    cube[5][2][0], cube[5][2][1], cube[5][2][2] = f1, f2, f3
+
+
+def front():
+    rotation(2)
+    u1, u2, u3 = cube[0][2][0], cube[0][2][1], cube[0][2][2]
+    cube[0][2][0], cube[0][2][1], cube[0][2][2] = cube[4][2][2], cube[4][1][2], cube[4][0][2]  # 왼
+    cube[4][2][2], cube[4][1][2], cube[4][0][2] = cube[1][0][2], cube[1][0][1], cube[1][0][0]  # 뒤
+    cube[1][0][2], cube[1][0][1], cube[1][0][0] = cube[5][0][0], cube[5][1][0], cube[5][2][0]
+    cube[5][0][0], cube[5][1][0], cube[5][2][0] = u1, u2, u3
+
+
+def back():
+    rotation(3)
+    u1, u2, u3 = cube[0][0][2], cube[0][0][1], cube[0][0][0]
+    cube[0][0][2], cube[0][0][1], cube[0][0][0] = cube[5][2][2], cube[5][1][2], cube[5][0][2]  # 오
+    cube[5][2][2], cube[5][1][2], cube[5][0][2] = cube[1][2][0], cube[1][2][1], cube[1][2][2]  # 아래
+    cube[1][2][0], cube[1][2][1], cube[1][2][2] = cube[4][0][0], cube[4][1][0], cube[4][2][0]  # 왼
+    cube[4][0][0], cube[4][1][0], cube[4][2][0] = u1, u2, u3
+
+
+def left():
+    rotation(4)
+    u1, u2, u3 = cube[0][0][0], cube[0][1][0], cube[0][2][0]
+    cube[0][0][0], cube[0][1][0], cube[0][2][0] = cube[3][2][2], cube[3][1][2], cube[3][0][2]
+    cube[3][2][2], cube[3][1][2], cube[3][0][2] = cube[1][0][0], cube[1][1][0], cube[1][2][0]
+    cube[1][0][0], cube[1][1][0], cube[1][2][0] = cube[2][0][0], cube[2][1][0], cube[2][2][0]
+    cube[2][0][0], cube[2][1][0], cube[2][2][0] = u1, u2, u3
+
+
+def right():
+    rotation(5)
+    u1, u2, u3 = cube[0][2][2], cube[0][1][2], cube[0][0][2]
+    cube[0][2][2], cube[0][1][2], cube[0][0][2] = cube[2][2][2], cube[2][1][2], cube[2][0][2]
+    cube[2][2][2], cube[2][1][2], cube[2][0][2] = cube[1][2][2], cube[1][1][2], cube[1][0][2]  # 아래
+    cube[1][2][2], cube[1][1][2], cube[1][0][2] = cube[3][0][0], cube[3][1][0], cube[3][2][0]  # 뒤
+    cube[3][0][0], cube[3][1][0], cube[3][2][0] = u1, u2, u3
+
+
+for tc in range(T):
+    '''
+    그냥 .. 내 방식대로 풀자..........
+    '''
+    color = ["w", "y", "r", "o", "g", "b"]
+    cube = []
+    for c in color:
+        grid = [[0] * 3 for i in range(3)]
+        for i in range(3):
+            for j in range(3):
+                grid[i][j] = c
+        cube.append(grid)
+
+    # for row in cube:
+    #     for col in row:
+    #         print(*col)
+
+    func_dict = {"U": up, "D": down, "F": front, "B": back, "L": left, "R": right}
+    _ = input()
+    order_lst = list(input().split())
+    for order in order_lst:
+        f, d = order
+        if d == "-":
+            d = 3
+        else:
+            d = 1
+
+        for dd in range(d):
+            func_dict[f]()
+
+    for i in range(3):
+        for j in range(3):
+            print(cube[0][i][j], end="")
+        print()
+
+
 '''
 # 백준 5373 큐빙
-# 체감난이도 플1이 맞다. 하드코딩 안하는 법이 생각이 안남 respect 준영
+# 체감난이도 플5이 맞다. 하드코딩 안하는 법이 생각이 안남 respect 준영
 
 # 문제 풀고 나서 기록
 

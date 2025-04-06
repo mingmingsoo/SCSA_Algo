@@ -1,4 +1,25 @@
 '''
+# 코드트리 전투 로봇
+2025.03.30.일
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 13:26
+    문제 종료 13:38
+    총 풀이시간 12분
+        26~27   : 문제이해(1)
+        27~30   : 메인 로직 작성(3)
+        30~33   : bfs 작성(3)
+        33~38   : 테케 검증(5)
+                    오타 발견 -> 수정
+                    monsters.append((dist + 1, r, c)) 에서
+                    monsters.append((dist + 1, nr, nc))
+
+  메모리 16 MB
+  시간 46 ms
+
+# 문제 풀면서 기록
 시간복잡도
 몬스터 수 n**2(시간)
 bfs n**2
@@ -33,7 +54,7 @@ def bfs(r, c):
                 nc = c + col[k]
                 if not (0 <= nr < n and 0 <= nc < n) or visited[nr][nc] or grid[nr][nc] > level:
                     continue
-                if 0< grid[nr][nc] < level:
+                if 0 < grid[nr][nc] < level:
                     monsters.append((dist + 1, nr, nc))
                 visited[nr][nc] = True
                 q.append((nr, nc, dist + 1))
@@ -49,7 +70,7 @@ while True:
         break
     monsters.sort()
     dist, mr, mc = monsters[0]
-    time+=dist
+    time += dist
     grid[mr][mc] = 0
     r, c = mr, mc
     eat += 1
@@ -58,7 +79,6 @@ while True:
         eat = 0
 
 print(time)
-
 
 '''
 # 문제 풀고 나서 기록
