@@ -1,5 +1,121 @@
 from collections import deque
 
+p, on = map(int, input().split())
+n = 2 ** p
+grid = [list(map(int, input().split())) for i in range(n)]
+
+order_lst = list(map(int, input().split()))
+
+
+def rotation(sr, sc):
+    small_grid = [_[sc:sc + m] for _ in grid[sr:sr + m]]
+    # 얘를 4등분해
+    small_grid1 = [_[:m // 2] for _ in small_grid[: m // 2]]
+    small_grid2 = [_[m // 2:m] for _ in small_grid[:m // 2]]
+    small_grid3 = [_[:m // 2] for _ in small_grid[m // 2:m]]
+    small_grid4 = [_[m // 2:m] for _ in small_grid[m // 2:m]]
+
+    for i in range(m // 2):
+        for j in range(m // 2):
+            grid[i + sr][j + sc] = small_grid3[i][j]
+    for i in range(m // 2):
+        for j in range(m // 2):
+            grid[i + sr][j + sc + m // 2] = small_grid1[i][j]
+    for i in range(m // 2):
+        for j in range(m // 2):
+            grid[i + sr + m // 2][j + sc] = small_grid4[i][j]
+    for i in range(m // 2):
+        for j in range(m // 2):
+            grid[i + sr + m // 2][j + sc + m // 2] = small_grid2[i][j]
+
+
+row = [-1, 1, 0, 0]
+col = [0, 0, 1, -1]
+
+for l in order_lst:
+    m = 2 ** l
+    # 잘라
+    if l != 0:
+        for i in range(0, n, m):
+            for j in range(0, n, m):
+                rotation(i, j)
+
+    delete = set()
+    for i in range(n):
+        for j in range(n):
+            ice = 0
+            for k in range(4):
+                nr = i + row[k]
+                nc = j + col[k]
+                if 0 <= nr < n and 0 <= nc < n and grid[nr][nc]:
+                    ice += 1
+
+            if ice < 3:
+                delete.add((i, j))
+    for r, c in delete:
+        if grid[r][c]:
+            grid[r][c] -= 1
+
+# 최대 군집 갯수
+maxi = 0
+visited = [[False] * n for i in range(n)]
+for i in range(n):
+    for j in range(n):
+        if grid[i][j] and not visited[i][j]:
+            visited[i][j] = True
+            cnt = 0
+            q = deque([(i, j)])
+            while q:
+                r, c = q.popleft()
+                cnt += 1
+                for k in range(4):
+                    nr = r + row[k]
+                    nc = c + col[k]
+                    if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] and not visited[nr][nc]:
+                        visited[nr][nc] = True
+                        q.append((nr, nc))
+            maxi = max(maxi, cnt)
+
+print(sum(map(sum, grid)))
+print(maxi)
+
+
+'''
+# 코드트리 회전하는 빙하
+2025.04.02 수
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 2회
+    문제 시작 19:38
+    1차 제출  20:40
+    문제 종료 20:41
+
+    총 풀이시간 63분
+        38~42 : 문제 이해
+        42~51 : 회전 로직
+        51~56 : 얼음 녹이는 로직 -> 여기서 어 1번 테케 답이 저렇게 나올 수 가 없눈데? 생각..
+                일단 그래도 bfs 로직 짜자 하고 작성
+        56~00 : 얼음 군집 bfs 로직 작성
+        00~41 : 1번 테케가 왜 다른지 문제 읽기..
+                내가 생각한 회전이랑 문제 회전이 다른 거 였음!!!! 회전 로직 수정하기
+        41~42 : 아차차 1번 테케 나와서 바로 제출했는데 l == 0 일땐 continue 해줘야함 ^^ 수정..
+
+  메모리 25 MB
+  시간 819 ms
+
+  회고
+    1. 백준 문제랑 달라서...... 너무나 당황함
+        1번 테케 답이 저렇게 나올 수 가 없는데ㅠㅠㅠㅠㅋㅋㅋ 한참 헤메다가 문제 다른 거 알고
+        회전 로직 고쳐서 수정했다.
+        문제를 잘 읽자!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        이 문제는 4등분해서 사분면 회전이다.
+
+
+'''
+
+from collections import deque
+
 poww, _ = map(int, input().split())
 n = 2 ** (poww)
 

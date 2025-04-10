@@ -1,3 +1,358 @@
+from collections import deque
+
+n, turn, sn, rp, sp = map(int, input().split())
+r, c = map(lambda x: int(x) - 1, input().split())  # 루돌푸 위치
+grid = [[0] * n for i in range(n)]
+santa_lst = [0] * (sn + 1)
+score = [0] * (sn + 1)
+for _ in range(sn):
+    idx, sr, sc = map(int, input().split())
+    grid[sr - 1][sc - 1] = idx
+    santa_lst[idx] = [sr - 1, sc - 1, 0]  # 위치, 기절
+row = [-1, 0, 1, 0, 1, 1, -1, -1]
+col = [0, 1, 0, -1, 1, -1, 1, -1]
+change = [2, 3, 0, 1]
+
+
+def is_end():
+    for idx, santa in enumerate(santa_lst):
+        if santa:
+            return False
+    return True
+
+
+def cal(x, y, nx, ny):
+    return (nx - x) ** 2 + (ny - y) ** 2
+
+
+def jump(nr, nc, d):
+    tmp = []
+    q = deque([(nr, nc)])
+    while q:
+        sr, sc = q.popleft()
+        tmp.append(grid[sr][sc])
+        nsr = sr + row[d]
+        nsc = sc + col[d]
+        if 0 <= nsr < n and 0 <= nsc < n and grid[nsr][nsc]:
+            q.append((nsr, nsc))
+
+    return tmp
+
+
+def merge(r, c, d, power, idx):  # 루돌프 위치는 바뀌면 안됨.
+    # 일단 기절 맥이고 점수 매경
+    score[idx] += power
+    grid[r][c] = 0
+    nr = r + row[d] * power
+    nc = c + col[d] * power
+    if not (0 <= nr < n and 0 <= nc < n):
+        santa_lst[idx] = 0
+    else:
+        if not grid[nr][nc]:
+            grid[nr][nc] = idx
+            santa_lst[idx] = [nr, nc, t]
+        else:
+            jump_lst = jump(nr, nc, d)
+            if jump_lst:
+                jump_lst.reverse()
+                for jdx in jump_lst:
+                    jr, jc = santa_lst[jdx][0], santa_lst[jdx][1]
+                    njr = jr + row[d]
+                    njc = jc + col[d]
+                    if 0 <= njr < n and 0 <= njc < n:
+                        grid[njr][njc], grid[jr][jc] = grid[jr][jc], grid[njr][njc]
+                        santa_lst[jdx][0] = njr
+                        santa_lst[jdx][1] = njc
+                    else:
+                        santa_lst[jdx] = 0
+                        grid[jr][jc] = 0
+            grid[nr][nc] = idx
+            santa_lst[idx] = [nr, nc, t]
+
+
+def myprint():
+    for i in range(n):
+        for j in range(n):
+            if (i,j) == (r,c):
+                print("R", end=  " ")
+            elif grid[i][j]:
+                print(grid[i][j], end = " ")
+            else:
+                print(0, end = " ")
+        print()
+
+for t in range(1, turn + 1):
+    # print("-------",t,"-------")
+    # 1. 루돌프 이동
+    lst = []
+    for idx, santa in enumerate(santa_lst):
+        if not santa:
+            continue
+        sr, sc, stun = santa
+        dist = cal(r, c, sr, sc)
+        lst.append((dist, (-sr, -sc), idx))
+    lst.sort()
+    _, location, sidx = lst[0]
+    sr, sc = -location[0], -location[1]
+    # 타겟은 정해졌고 타겟과 가장 가깝게
+    lst = []
+    for k in range(8):
+        nr = r + row[k]
+        nc = c + col[k]
+        if 0 <= nr < n and 0 <= nc < n:
+            dist = cal(nr, nc, sr, sc)
+            lst.append((dist, (nr, nc), k))
+    lst.sort()
+    _, location, ru_d = lst[0]
+    r, c = location  # 옮겻!!
+
+    if grid[r][c]:
+        merge(r, c, ru_d, rp, grid[r][c])
+    # print("루돌프 이동 후")
+    # myprint()
+    # 2. 산타 이동
+    for idx, santa in enumerate(santa_lst):
+        if not santa:
+            continue
+        sr, sc, stun = santa
+        if stun and stun >= t - 1:  # 기절한 애들
+            continue
+        lst = []
+        cur = cal(sr,sc,r,c)
+        for k in range(4):
+            nr = sr + row[k]
+            nc = sc + col[k]
+            if 0 <= nr < n and 0 <= nc < n and not grid[nr][nc]:
+                dist = cal(nr, nc, r, c)
+                if cur > dist:
+                    lst.append((dist, k, (nr, nc)))
+        if lst:
+            lst.sort()
+            _, s_d, location = lst[0]
+            nr, nc = location
+            if (nr, nc) == (r, c):
+                grid[sr][sc] = 0
+                merge(r, c, change[s_d], sp, idx)
+            else:
+                # 그냥 이동
+                santa_lst[idx] = [nr, nc, stun]
+                grid[nr][nc], grid[sr][sc] = grid[sr][sc], grid[nr][nc]
+        # print(idx,"번 산타 이동")
+        # myprint()
+    # 3. 살아있는 애들 +1 점
+    all_die = True
+    for idx, santa in enumerate(santa_lst):
+        if santa:
+            score[idx] += 1
+            all_die = False
+    if all_die:
+        break
+print(*score[1:])
+
+'''
+# 코드트리 루돌프의 반란
+2025.04.06.일
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출횟수 1회
+    문제 시작 20:09
+    문제 종료 21:26
+
+    총 풀이시간 77분
+        09~28   : 문제이해 및 손코딩, 입력받기(19)
+        28~39   : 루돌프 이동(11)
+        39~45   : merge 상호작용 빼고 작성(6)
+        45~58   : 산타 이동(13)
+        58~11   : 상호작용 jump 작성(13)
+        11~17   : 살아있는 산타 +1 점, 다 튕겨저 나갔으면 break 로직 작성(6)
+        17~26   : 검증(9)
+
+    메모리 19 MB
+    시간 99 ms
+    
+    회고
+    1. 두번째 풀이인데도 어렵다. 다시 풀어보기
+    
+
+# 문제 풀면서의 기록
+문제설명
+    1. 루돌프 이동
+    2. 산타 이동
+입력
+    맵 n 턴 수 m 산타 수 p 루돌프 힘 c 산타 힘 d
+    루돌프 위치
+    산타 번호와 위치
+
+5 1 4 1 1
+5 1
+1 4 2
+2 3 3
+3 2 4
+4 1 5
+
+5 2 4 1 1
+5 1
+1 5 2
+2 5 3
+3 5 4
+4 5 5
+
+'''
+from collections import deque
+
+n, turn, sn, rp, sp = map(int, input().split())
+rr, rc = map(lambda x: int(x) - 1, input().split())
+grid = [[0] * n for i in range(n)]
+santa_lst = [0] * (sn + 1)
+row = [-1, 0, 1, 0, 1, 1, -1, -1]
+col = [0, 1, 0, -1, 1, -1, 1, -1]
+change = [2, 3, 0, 1]
+for s in range(sn):
+    idx, r, c = map(int, input().split())
+    santa_lst[idx] = [r - 1, c - 1, 0]  # 기절 시간
+    grid[r - 1][c - 1] = idx
+score = [0] * (sn + 1)
+
+
+def cal(rr, rc, sr, sc):
+    return (rr - sr) ** 2 + (rc - sc) ** 2
+
+
+def jump(nr, nc, d):
+    q = deque([(nr, nc)])
+    tmp = []
+    while q:
+        qr, qc = q.popleft()
+        tmp.append(grid[qr][qc])
+        nqr, nqc = qr + row[d], qc + col[d]
+        if 0 <= nqr < n and 0 <= nqc < n and grid[nqr][nqc]:
+            q.append((nqr, nqc))
+    return tmp
+
+
+def merge(rr, rc, idx, d, power):
+    global score
+    # 점수 맥이고 기절
+    santa_lst[idx][2] = t  # 기절!
+    score[idx] += power
+    grid[rr][rc] = 0
+
+    # 산타 이동
+    nr = rr + row[d] * power
+    nc = rc + col[d] * power
+    if not (0 <= nr < n and 0 <= nc < n):  # 쥬금
+        santa_lst[idx] = 0
+        return
+    if grid[nr][nc] == 0:  # 빈 공간이면 충돌 없성
+        grid[nr][nc] = idx
+        santa_lst[idx][0] = nr
+        santa_lst[idx][1] = nc
+    else:
+        # 충돌 발생....
+        move_lst = jump(nr, nc, d)
+        move_lst.reverse()
+        for jdx in move_lst:
+            # 한 칸 씩만 밀리넹..
+            sr, sc, stun = santa_lst[jdx]
+            nsr = sr + row[d]
+            nsc = sc + col[d]
+            if not (0 <= nsr < n and 0 <= nsc < n):
+                santa_lst[jdx] = 0  # 쥬금
+                grid[sr][sc] = 0
+            else:
+                santa_lst[jdx][0] = nsr
+                santa_lst[jdx][1] = nsc
+                grid[sr][sc], grid[nsr][nsc] = grid[nsr][nsc], grid[sr][sc]
+
+        grid[nr][nc] = idx
+        santa_lst[idx][0] = nr
+        santa_lst[idx][1] = nc
+
+
+def ru_move():
+    global rr, rc
+    lst = []
+    for idx, santa in enumerate(santa_lst):
+        if santa == 0:  # 쥬근애 빼고
+            continue
+        sr, sc, stun = santa
+        dist = cal(rr, rc, sr, sc)
+        lst.append((dist, -sr, -sc, idx))
+
+    lst.sort()
+    dist, sr, sc, idx = lst[0]
+    sr *= -1
+    sc *= -1
+    lst = []
+    for k in range(8):
+        nr = rr + row[k]
+        nc = rc + col[k]
+        dist = cal(nr, nc, sr, sc)
+        lst.append((dist, nr, nc, idx, k))
+    lst.sort()
+    dist, nr, nc, idx, d = lst[0]
+    rr, rc = nr, nc  # 루돌프 위치 변환
+    if grid[rr][rc]:  # 충돌 발생
+        merge(rr, rc, idx, d, rp)
+
+
+def santa_move():
+    for idx, santa in enumerate(santa_lst):
+        if santa == 0:  # 쥬근애 빼고
+            continue
+        sr, sc, stun = santa
+        if stun and stun >= t - 1:  # 기절빼고
+            continue
+        cur = cal(rr, rc, sr, sc)
+        lst = []
+        for k in range(4):
+            nr = sr + row[k]
+            nc = sc + col[k]
+            next = cal(rr, rc, nr, nc)
+            if 0 <= nr < n and 0 <= nc < n and next < cur and grid[nr][nc] == 0:
+                lst.append((next, k, nr, nc))
+        if lst:
+            lst.sort()
+            dist, d, nr, nc = lst[0]
+            santa_lst[idx][0] = nr
+            santa_lst[idx][1] = nc
+            grid[sr][sc], grid[nr][nc] = grid[nr][nc], grid[sr][sc]
+            if (nr, nc) == (rr, rc):
+                merge(rr, rc, idx, change[d], sp)
+        # print(idx,"번 산타 이동 후")
+        # myprint()
+
+def myprint():
+    for i in range(n):
+        for j in range(n):
+            if (i, j) == (rr, rc):
+                print("R", end=" ")
+            else:
+                print(grid[i][j], end=" ")
+        print()
+
+# myprint()
+for t in range(1, turn + 1):
+    # print("---",t,"---")
+    # 1. 루돌프 이동
+    ru_move()
+    # print("루돌프 이동 후")
+    # myprint()
+    # 2. 산타 이동
+    santa_move()
+    # myprint()
+    all_die = True
+    for idx, santa in enumerate(santa_lst):
+        if santa:
+            score[idx] += 1
+            all_die = False
+    if all_die:
+        break
+    # print(santa_lst)
+print(*score[1:])
+
+
 '''
 # 체감난이도 골1~플5
 

@@ -1,5 +1,302 @@
 '''
-# 체감난이도 플1
+# 김혜준 지켜야할 거 리스트업
+
+    1. 문제 천천히.꼼꼼히 제발
+    2. 2차원 배열 만들 때 for in range(n) 안붙힘
+    3. 극간값 생각하기 예를 들어 100초까지면 99초까지봤음
+    4. 작성시 한줄한줄 꼼꼼히 와라라락 쓰면 안됨. = 제발 차분히
+    5. 보기랑 테케랑 다를 수 있으니 명심 파이어스톰에서 회전됐는데 보기랑 테케 달라서 계속 틀린줄 암
+    6. 시뮬레이션에서 테케가 몇개 틀리면, 혹시 동작 순서가 이상한 건 아닌지 확인 (주사위 굴리기나 선물이 넘쳐흘러처럼)
+    7. 인구이동 자료구조 만드는 거는 참고해도 될 듯 최적화 관련해서
+    8. 프린트 안지우고 제출한거 2트임 진짜 왜구래ㅠ 확인하고 내야지
+    9. 내가 관리해야할 대상이 여러개면 하나만 보지말고 대상 모두 전반적으로 print 해서 상태 확인하기(아기 상어 eat 초기화 안함 이슈)
+    10. 파핑파핑이나 다리만들기 bfs에서 미리 visited 초기화 해줘야함. r,c  하고 다음에 visited 처리하면 안됨.. nr,nc 에서 꼭 처리해줘야함
+            -> 그래야 중복으로 안들어감
+    11. 규칙찾기 진짜 못하는듯.. 그래도 찾아라 규칙 못찾으면 몸이 힘들다
+    12. 시뮬레이션이라고 너무 동작 순서별로 기능 나누지 말고!!
+            일단 나눈 다음에 혹시 동작들을 합쳐도 되는지 확인하기!!!(나무재테크처럼)
+    13. 조건문 쓸꺼면 잘 확인하고 쓰기(원판돌리기)
+    14. 문제를 잘읽자........윷놀이 사기단을 잊지마...........
+    15. 테케 안나오면 오타 없는지도 꼭 확인해주기! (마법사 상어와 복제) r2,c2를 r3,c2로 썼음 오타만 내지말자 제밢
+    16. 조회연산 많으면 set쓰자 (온풍기 안녕)
+    17. 시험 전에 가운데부터 시작하는 달팽이 풀고가기
+    18. new_grid 만들어서 넣어줄 때 이동할때만 넣어주지말고 이동하지 않을때도 넣어주는 거 확인해!!!!!!!!!!!!(술래잡기)
+
+    19. 순차(?) 문제에서 1차원 배열로 관리할거면 nr,nc,nd 갱신 확실히 하기!!
+            -> 이거 때문에 디버깅 했응게!! 그리고 싸움땅에서도 한번 틀림;;;  방향 바꾸고 리스트에 갱신 확실히 하기
+    20. enumerate 안붙힘
+    21. 컨티뉴 조심!!!!!!!!!!!!!!!!!!!!!!!! 컨티뉴 밑에 동작 로직 진짜 넘어가도 되는지 확인해
+    23. visited True 꼭
+    24. 미지의 공간 탈출에서 면 이동할때
+        nr = 0
+        nc = m - 1 - nr
+        이렇게 되어있어서 원본 nr 이 바껴서 nc가 이상한데로 갔음!!! 이런 로직에서 주의하기!
+
+
+
+# 코드트리 미지의 공간 탈출
+2025.04.08.화
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출횟수 2회
+    문제 시작 14:03
+    1차 제출  15:35
+    문제 종료 15:48
+
+    총 풀이시간 85분
+        03~17   : 문제이해 및 손코딩(14)
+        17~20   : 입력 받기 (3)
+        20~40   : ----교수님 말씀---- (20)
+        40~54   : 필요한 좌표 찾기 및 확인 동,서,남,북 방향으로(14)
+        54~18   : 3차원 bfs(24)
+                    디버깅
+                    (1) h 조건 분기 if, if... 에서 if, elif,.. 로 변경
+                    (2) 원본 h 쓰지 않고 nh 생성
+        18~21   : 2차원 bfs(3)
+        21~26   : 시간 이상 현상(5)
+        26~31   : 시간 이상 현상 맵 만들어놨으니까 2차원 bfs 수정(5)
+        31~35   : 검증(4)
+                    시간 이상 현상이 2차원 시작점을 막을 때
+                    for error in time_error[two_sc][two_sc]: <- sc, sc 로 오타 있어서 수정!
+                    -> for error in time_error[two_sr][two_sc]:
+        35~48   : 틀렸습니다!(13)
+                    아 시간이상현상은 4로는 못가는 구나 수정!
+                    어 근데 답이 다르게 나옴????
+                    북 -> 동으로 가는 로직에서
+                    nr = 0
+                    nc = m - 1 - nr
+
+                    이렇게 되어있으면 nr이 0으로 바뀌기 때문에 순서 수정!
+                    nc = m - 1 - nr
+                    nr = 0
+
+                    다른 것 도 검사!
+
+    메모리 17 MB
+    시간 55 ms
+
+    회고
+    1. 1회차때 안했던 실수를 두가지나 했음
+        (1) 시간 이상 현상은 4로는 못가는데 갈 수 있다고 생각 -> 문제에 써있는데 ㅡㅡ 과해석 한거지 뭐... 문제 꼼꼼히 읽기@@@!!!!!!!!!!
+        (2) 면 이동에서 nr,nc 순서로 답이 다르게 나옴!!!!! 다음에도 이럴 수 있으니 주의하기!!
+
+
+
+'''
+from collections import deque
+
+n, m, bn = map(int, input().split())
+
+grid = [list(map(int, input().split())) for i in range(n)]
+cube = [[list(map(int, input().split())) for i in range(m)] for i in range(5)]
+time_tmp = [list(map(int, input().split())) for i in range(bn)]
+row = [0, 0, 1, -1]
+col = [1, -1, 0, 0]
+
+
+# 동  서  남  북
+
+
+def find_three():
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 3:
+                return i, j
+
+
+# 3차원 시작점
+three_first_r, three_first_c = find_three()
+
+
+def find_two_end():
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 4:
+                return i, j
+
+
+# 2차원 탈출구
+two_er, two_ec = find_two_end()
+
+
+# 2차원 시작점 및 3차원 탈출구
+def find_two_start_three_end():
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 3:
+                for k in range(4):
+                    nr = i + row[k]
+                    nc = j + col[k]
+                    if 0 <= nr < n and 0 <= nc < n and (grid[nr][nc] == 0 or grid[nr][nc] == 4):
+                        if k == 0:
+                            return nr, nc, k, m - 1, m - 1 - (nr - three_first_r)
+                        elif k == 1:
+                            return nr, nc, k, m - 1, nr - three_first_r
+                        elif k == 2:
+                            return nr, nc, k, m - 1, nc - three_first_c
+                        elif k == 3:
+                            return nr, nc, k, m - 1, m - 1 - (nc - three_first_c)
+
+
+two_sr, two_sc, three_eh, three_er, three_ec = find_two_start_three_end()
+
+
+def find_three_start():
+    for i in range(m):
+        for j in range(m):
+            if cube[4][i][j] == 2:
+                return 4, i, j
+
+
+three_sh, three_sr, three_sc = find_three_start()
+
+time_error = [[[] for i in range(n)] for i in range(n)]
+for tr, tc, td, tv in time_tmp:
+    time = 0
+    while True:
+        time_error[tr][tc].append(time)
+        ntr = tr + row[td]
+        ntc = tc + col[td]
+        if not (0 <= ntr < n and 0 <= ntc < n) or grid[ntr][ntc] != 0:
+            break
+        time += tv
+        tr = ntr
+        tc = ntc
+
+
+def bfs3():
+    visited = [[[False] * m for i in range(m)] for i in range(5)]
+    visited[three_sh][three_sr][three_sc] = True
+    q = deque([(three_sh, three_sr, three_sc, 0)])
+    while q:
+        h, r, c, cnt = q.popleft()
+        # print(h, r, c, cnt,path)
+        if (h, r, c) == (three_eh, three_er, three_ec):
+            return cnt
+
+        for k in range(4):
+            nr = r + row[k]
+            nc = c + col[k]
+            nh = h
+            if nh == 4:  # 동서남북 갈 수 있음
+                if nr < 0:  # 북
+                    nh = 3
+                    nr = 0
+                    nc = m - 1 - nc
+                elif nr >= m:  # 남
+                    nh = 2
+                    nr = 0
+                    nc = nc
+                elif nc < 0:  # 서
+                    nh = 1
+                    nr = 0
+                    nc = nr
+                elif nc >= m:  # 동
+                    nh = 0
+                    nc = m - 1 - nr
+                    nr = 0
+            elif nh == 0:  # 동: 위남북 갈 수 있음
+                if nr < 0:  # 윗면
+                    nh = 4
+                    nr = m - 1 - nc
+                    nc = m - 1
+                elif nc < 0:  # 남
+                    nh = 2
+                    nr = nr
+                    nc = m - 1
+                elif nc >= m:  # 북
+                    nh = 3
+                    nr = nr
+                    nc = 0
+            elif nh == 1:  # 서: 위북남 갈 수 있음
+                if nr < 0:  # 윗면
+                    nh = 4
+                    nr = nc
+                    nc = 0
+                elif nc < 0:  # 북
+                    nh = 3
+                    nr = nr
+                    nc = m - 1
+                elif nc >= m:  # 남
+                    nh = 2
+                    nr = nr
+                    nc = 0
+            elif nh == 2:  # 남: 위서동 갈 수 있음
+                if nr < 0:  # 윗면
+                    nh = 4
+                    nr = m - 1
+                    nc = nc
+                elif nc < 0:  # 서
+                    nh = 1
+                    nr = nr
+                    nc = m - 1
+                elif nc >= m:  # 동
+                    nh = 0
+                    nr = nr
+                    nc = 0
+            elif nh == 3:  # 북: 위동서 갈 수 있음
+                if nr < 0:  # 윗면
+                    nh = 4
+                    nc = m - 1 - nr
+                    nr = 0
+                elif nc < 0:  # 동
+                    nh = 0
+                    nr = nr
+                    nc = m - 1
+                elif nc >= m:  # 서
+                    nh = 1
+                    nr = nr
+                    nc = 0
+            if not (0 <= nr < m and 0 <= nc < m) or visited[nh][nr][nc] or cube[nh][nr][nc]:
+                continue
+            visited[nh][nr][nc] = True
+            q.append((nh, nr, nc, cnt + 1))
+    return -1
+
+
+def bfs2():
+    visited = [[False] * n for i in range(n)]
+    visited[two_sr][two_sc] = True
+    q = deque([(two_sr, two_sc, 0)])
+    while q:
+        r, c, cnt = q.popleft()
+        if (r, c) == (two_er, two_ec):
+            return cnt
+
+        for k in range(4):
+            nr = r + row[k]
+            nc = c + col[k]
+            if not (0 <= nr < n and 0 <= nc < n) or visited[nr][nc] or grid[nr][nc] == 1:
+                continue
+            te = False
+            for error in time_error[nr][nc]:
+                if cnt + 1 + ans3 >= error:
+                    te = True
+                    break
+            if not te:
+                visited[nr][nc] = True
+                q.append((nr, nc, cnt + 1))
+    return -1
+
+
+ans = -1
+ans3 = bfs3()
+if ans3 != -1:
+    ans3 += 1
+    te = False
+    for error in time_error[two_sr][two_sc]:
+        if ans3 >= error:
+            te = True
+            break
+    if not te:
+        ans2 = bfs2()
+        if ans2 != -1:
+            ans = ans3 + ans2
+print(ans)
+
+'''
+# 체감난이도 골1
 
 # 문제 풀고 나서 기록
     제출 횟수 1회

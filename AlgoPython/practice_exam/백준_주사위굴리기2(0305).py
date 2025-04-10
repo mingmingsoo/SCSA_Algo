@@ -1,4 +1,24 @@
 '''
+# 코드트리 정육면체 한번 더 굴리기
+2025.04.03.목
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 21:25
+    문제 종료 21:56
+
+    총 풀이시간 31분
+        25~32 : 문제 이해, 초기주석(7)
+        32~36 : bfs 로직(4)
+        36~46 : 주사위 굴리는 로직(10)
+        46~55 : 검증(9)
+                dice = [1, 6, 5, 2, 4, 3]
+                면 순서가 그림이랑 달라서 수정!!
+
+  메모리 16 MB
+  시간 52 ms
+
 문제 설명
     - 점수판이 필요하다
     - 주사위 굴린다
@@ -41,17 +61,6 @@ def bfs(r, c):
         score_grid[r][c] = sm
 
 
-for i in range(n):
-    for j in range(m):
-        if not visited[i][j]:
-            visited[i][j] = True
-            bfs(i, j)
-    #  위 아래 앞  뒤 왼 오
-dice = [1, 6, 5, 2, 4, 3]
-r = c = d = 0
-ans = 0
-
-
 def rotation():
     global dice
     if d == 0:
@@ -63,6 +72,16 @@ def rotation():
     elif d == 1:  # 남
         dice = [dice[3], dice[2], dice[0], dice[1], dice[4], dice[5]]
 
+
+for i in range(n):
+    for j in range(m):
+        if not visited[i][j]:
+            visited[i][j] = True
+            bfs(i, j)
+    #  위 아래 앞  뒤 왼 오
+dice = [1, 6, 5, 2, 4, 3]
+r = c = d = 0
+ans = 0
 
 for t in range(turn):
     nr = r + row[d]
@@ -82,7 +101,6 @@ for t in range(turn):
     r = nr
     c = nc
 print(ans)
-
 
 '''
 
@@ -182,8 +200,8 @@ for move in range(move_num):
     # 만약, 이동 방향에 칸이 없다면,
     # 이동 방향을 반대로 한 다음 한 칸 굴러간다.
 
-    if not (0 <= r + row[d] < n and 0 <= c + col[d] < m): # 만약, 이동 방향에 칸이 없다면,
-        d = (d + 2) % 4 # 이동 방향을 반대로 한 다음 한 칸 굴러간다.
+    if not (0 <= r + row[d] < n and 0 <= c + col[d] < m):  # 만약, 이동 방향에 칸이 없다면,
+        d = (d + 2) % 4  # 이동 방향을 반대로 한 다음 한 칸 굴러간다.
     r = r + row[d]
     c = c + col[d]
 
