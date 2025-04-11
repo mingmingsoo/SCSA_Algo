@@ -1,24 +1,46 @@
-'''
-낮에 올때랑 밤에올때랑 다른가 . 아 ㅇㅇ뭐야 안움직일 때 생각해야함
-'''
+import heapq
 from collections import deque
 
-n, m, bomb = map(int, input().split())
-grid = [list(input()) for i in range(n)]
-visited = [[[[False] * 2 for i in range(bomb + 1)] for i in range(m)] for i in range(n)]
+n, m, limit = map(int, input().split())
 
-sr, sc, er, ec = 0, 0, m - 1, n - 1
+grid = [list(map(int, input())) for i in range(n)]
+
+sr, sc, er, ec = 0, 0, n - 1, m - 1
+
+ans = -1
 row = [-1, 1, 0, 0]
 col = [0, 0, 1, -1]
-q = deque([(sr, sc, 0, 0)])
-ans = -1
-while q:
-    r, c, bomb, time = q.popleft()
-    if (r, c) == (er, ec):
-        ans = time
-        break
+ans = int(1e9)
 
-    for k in range(4):
-        nr = r + row[k]
-        nc = c + col[k]
-        if grid[nr][nc] == 0 and not visited[nr][nc][]
+
+def bfs(sr, sc, er, ec):
+    global ans
+    visited = [[[int(1e9)] * (limit + 1) for i in range(m)] for i in range(n)]
+    visited[sr][sc][limit] = 0
+    q = deque([(0, sr, sc, limit)])
+    while q:
+        dist, r, c, bomb = q.popleft()
+        if (r, c) == (er, ec):
+            ans = min(ans, dist + 1)
+            return
+        for k in range(4):
+            nr = r + row[k]
+            nc = c + col[k]
+            if not (0 <= nr < n and 0 <= nc < m):
+                continue
+            if grid[nr][nc] == 1 and bomb and visited[nr][nc][bomb - 1] > dist + 1:
+                if dist % 2 == 0:
+                    visited[nr][nc][bomb - 1] = dist + 1
+                    q.append((dist + 1, nr, nc, bomb - 1))
+                else:
+                    q.append((dist + 1, r, c, bomb))
+            elif grid[nr][nc] == 0 and visited[nr][nc][bomb] > dist + 1:
+                visited[nr][nc][bomb] = dist + 1
+                q.append((dist + 1, nr, nc, bomb))
+
+
+bfs(sr, sc, er, ec)
+if ans == int(1e9):
+    print(-1)
+else:
+    print(ans)

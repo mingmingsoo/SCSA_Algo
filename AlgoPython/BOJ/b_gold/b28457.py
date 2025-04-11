@@ -1,10 +1,12 @@
 n, money, start_money, gn = map(int, input().split())
 gold_lst = [list(map(int, input().split())) for i in range(gn)]
 grid = [[0] * n for i in range(n)]
+visited = [[0] * n for i in range(n)]
 grid[n - 1][n - 1] = "ST"
 grid[n - 1][0] = "MU"
 grid[0][0] = "SA"
 grid[0][n - 1] = "WU"
+golden_dict = {}
 r, c = n - 1, n - 2
 row = [0, -1, 0, 1]
 col = [-1, 0, 1, 0]
@@ -33,8 +35,7 @@ idx = -1
 didx = 0
 gidx = 0
 early_end = False
-len_dice = len(dice)
-while didx < len_dice:
+while didx < len(dice):
 
     d1, d2 = dice[didx]
     go = d1 + d2
@@ -92,14 +93,48 @@ while didx < len_dice:
                 early_end = True
                 break
         elif ty == 4:
-            dice.insert(didx + 1, [order, 0])
-            len_dice = len(dice)
+            for o in range(order):  # 이동하고 나서 특정 칸에서 일어나야 할 일들(땅 구매, 우주여행 등)이 그대로 일어남에 유의해야 한다.
+                idx = (idx + 1) % (4 * n - 4)
+                r, c = location[idx]
+                if o != order - 1 and grid[r][c] == "ST":
+                    money += start_money
+
+            if grid[r][c] == "ST":
+                money += start_money
+            elif grid[r][c] == "MU":
+                d1a, d2a = dice[didx + 1]
+                if d1a == d2a:
+                    didx += 2
+                    continue
+
+                d1a, d2a = dice[didx + 2]
+                if d1a == d2a:
+                    didx += 3
+                    continue
+
+                d1a, d2a = dice[didx + 3]
+                if d1a == d2a:
+                    didx += 4
+                    continue
+                didx += 4
+                continue
+
+            elif grid[r][c] == "SA":
+                money += social_money
+                social_money = 0
+            elif grid[r][c] == "WU":
+                idx = -1
+            elif type(grid[r][c]) == int and 1 <= grid[r][c] <= 100_000:
+                if not visited[r][c] and money >= grid[r][c]:
+                    visited[r][c] = 1
+                    money -= grid[r][c]
         gidx = (gidx + 1) % gn
     else:
         r, c = location[idx]
-        if grid[r][c] and money >= grid[r][c]:
+        if not visited[r][c] and money >= grid[r][c]:
+            visited[r][c] = 1
             money -= grid[r][c]
-            grid[r][c] = 0
+
     didx += 1
 if early_end:
     print("LOSE")
@@ -107,7 +142,7 @@ else:
     ans = "WIN"
     for i in range(n):
         for j in range(n):
-            if grid[i][j] not in ("ST", "MU", "SA", "WU", "G") and grid[i][j]:
+            if type(grid[i][j]) == int and 1 <= grid[i][j] <= 100_000 and not visited[i][j]:
                 ans = "LOSE"
                 break
         if ans == "LOSE":
