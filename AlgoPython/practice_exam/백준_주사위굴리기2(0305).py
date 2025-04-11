@@ -1,4 +1,108 @@
 '''
+# 코드트리 정육면체 한번 더 굴리기
+2025.04.03.목
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 21:25
+    문제 종료 21:56
+
+    총 풀이시간 31분
+        25~32 : 문제 이해, 초기주석(7)
+        32~36 : bfs 로직(4)
+        36~46 : 주사위 굴리는 로직(10)
+        46~55 : 검증(9)
+                dice = [1, 6, 5, 2, 4, 3]
+                면 순서가 그림이랑 달라서 수정!!
+
+  메모리 16 MB
+  시간 52 ms
+
+문제 설명
+    - 점수판이 필요하다
+    - 주사위 굴린다
+      (1) 범위 검사 -> 방향만 바꾸기
+      (2) nr, nc 구하고
+      (0) 점수
+      (3) 아랫면하고 비교 해서 방향 바꾸기
+헷갈리는 게 처음 위치에서도 점수 얻는지? ㄴㄴ
+처음엔 항상 오른쪽
+'''
+from collections import deque
+
+n, m, turn = map(int, input().split())
+grid = [list(map(int, input().split())) for i in range(n)]
+
+score_grid = [[0] * m for i in range(n)]
+visited = [[False] * m for i in range(n)]
+row = [0, 1, 0, -1]
+col = [1, 0, -1, 0]
+
+
+def bfs(r, c):
+    num = grid[r][c]
+    q = deque([(r, c)])
+    location = set()
+    while q:
+        r, c = q.popleft()
+        location.add((r, c))
+
+        for k in range(4):
+            nr = r + row[k]
+            nc = c + col[k]
+            if not (0 <= nr < n and 0 <= nc < m) or visited[nr][nc] or grid[nr][nc] != num:
+                continue
+            visited[nr][nc] = True
+            q.append((nr, nc))
+    sm = num * len(location)
+
+    for r, c in location:
+        score_grid[r][c] = sm
+
+
+def rotation():
+    global dice
+    if d == 0:
+        dice = [dice[4], dice[5], dice[2], dice[3], dice[1], dice[0]]
+    elif d == 2:
+        dice = [dice[5], dice[4], dice[2], dice[3], dice[0], dice[1]]
+    elif d == 3:  # 북
+        dice = [dice[2], dice[3], dice[1], dice[0], dice[4], dice[5]]
+    elif d == 1:  # 남
+        dice = [dice[3], dice[2], dice[0], dice[1], dice[4], dice[5]]
+
+
+for i in range(n):
+    for j in range(m):
+        if not visited[i][j]:
+            visited[i][j] = True
+            bfs(i, j)
+    #  위 아래 앞  뒤 왼 오
+dice = [1, 6, 5, 2, 4, 3]
+r = c = d = 0
+ans = 0
+
+for t in range(turn):
+    nr = r + row[d]
+    nc = c + col[d]
+    if not (0 <= nr < n and 0 <= nc < m):
+        d = (d + 2) % 4
+    nr = r + row[d]
+    nc = c + col[d]
+
+    ans += score_grid[nr][nc]
+    rotation()
+
+    if dice[1] > grid[nr][nc]:
+        d = (d + 1) % 4
+    elif dice[1] < grid[nr][nc]:
+        d = (d - 1) % 4
+    r = nr
+    c = nc
+print(ans)
+
+'''
 
 # 백준 23288 주사위 굴리기2 (코드트리 정육면체 한번 더 굴리기)
 
@@ -96,8 +200,8 @@ for move in range(move_num):
     # 만약, 이동 방향에 칸이 없다면,
     # 이동 방향을 반대로 한 다음 한 칸 굴러간다.
 
-    if not (0 <= r + row[d] < n and 0 <= c + col[d] < m): # 만약, 이동 방향에 칸이 없다면,
-        d = (d + 2) % 4 # 이동 방향을 반대로 한 다음 한 칸 굴러간다.
+    if not (0 <= r + row[d] < n and 0 <= c + col[d] < m):  # 만약, 이동 방향에 칸이 없다면,
+        d = (d + 2) % 4  # 이동 방향을 반대로 한 다음 한 칸 굴러간다.
     r = r + row[d]
     c = c + col[d]
 

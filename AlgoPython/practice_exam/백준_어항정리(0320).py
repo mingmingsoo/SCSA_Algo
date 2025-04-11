@@ -1,10 +1,142 @@
+N, limit = map(int, input().split())
+arr = list(map(int, input().split()))
+
+
+def rotation(small):
+    n, m = len(small), len(small[0])
+    ro = [[0] * n for i in range(m)]
+    for i in range(m):
+        for j in range(n):
+            ro[i][j] = small[n - j - 1][i]
+    return ro
+
+
+row = [-1, 1, 0, 0]
+col = [0, 0, 1, -1]
+
+
+def pull():
+    plus = []
+    for i in range(len(arr)):
+        for j in range(len(arr[i])):
+            for k in range(4):
+                nr = i + row[k]
+                nc = j + col[k]
+                if 0 <= nr < len(arr) and 0 <= nc < len(arr[nr]) and arr[nr][nc] < arr[i][j]:
+                    diff = arr[i][j] - arr[nr][nc]
+                    diff //= 5
+                    plus.append((i, j, -diff))
+                    plus.append((nr, nc, +diff))
+    for r, c, diff in plus:
+        arr[r][c] += diff
+
+
+ans = 0
+time = 0
+while True:
+    if max(arr) - min(arr) <= limit:
+        ans = time
+        break
+
+    mini = min(arr)
+    for idx, mil in enumerate(arr):
+        if mil == mini:
+            arr[idx] += 1
+
+    # 일단 하나 올리기
+    arr = [[arr[0]]] + [arr[1:]]
+    while True:
+        if len(arr) > len(arr[-1]) - len(arr[0]):
+            break
+        l = len(arr[0])
+        small = [_[:l] for _ in arr]
+        small = rotation(small)
+        arr = small + [arr[-1][l:]]
+
+
+    # 도우 누르기
+    pull()
+
+
+    # 펴기
+    maxi = len(arr[-1])
+    for _ in arr:
+        if len(_) < maxi:
+            _.extend([-1] * (maxi - len(_)))
+
+    new_arr = []
+    for j in range(maxi):
+        for i in range(len(arr) - 1, -1, -1):
+            if arr[i][j] != -1:
+                new_arr.append(arr[i][j])
+
+    # 두번 반 접기
+    arr = [new_arr[:N // 2][::-1]] + [new_arr[N // 2:]]
+    small = [_[:N // 4] for _ in arr]
+    small = rotation(small)
+    small = rotation(small)
+    arr = small + [_[N // 4:] for _ in arr]
+
+    pull()
+
+
+    new_arr = []
+    for j in range(len(arr[0])):
+        for i in range(len(arr) - 1, -1, -1):
+            if arr[i][j] != -1:
+                new_arr.append(arr[i][j])
+    arr = new_arr
+    time += 1
+
+print(ans)
+
+
 '''
+# 코드트리 Sam의 피자학교
+2025.04.05.토
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 12:43
+    문제 종료 13:34
+
+    총 풀이시간 51분
+        43~49   : 문제 이해 (6)
+        49~58   : 1차 말기[1] (9)
+                    일단 두개 올리기
+        58~04   : 1차 말기[2] (6)
+                    조건 달아서 말 수 있을 때까지 말기
+                    sero = len(arr)
+                    namuji_karo = len(arr[-1]) - len(arr[0])
+                    if sero > namuji_karo:
+                        break
+        04~10   : 도우 누르기[1](나눠주는 과정) (6)
+                    배열이 모양이 균일하지 않기에
+                    plus_grid를 평소 사용하는데 plus를 lst로 관리
+                    처음엔 set으로 했다가 중복으로 더해지고 빼질 수 있어서 lst로!
+        10~17   : 도우 누르기[2](한 줄로 펴는 과정) (7)
+                    2중 포문을 돌아야하는데 범위가 다르고 j, i 순이여서..
+                    균일하지 않은 배열의 최대 열을 잡고 부족한 곳은 -1로 채워서 해결
+        17~27   : 도우 2차 말기 (10)
+                    여기서 180도 회전을 해줘야하는데
+                    잘 안돼서 90도 회전 두번 시킴!! 180도 회전은 회고에 적혀있음
+        27~30   : 종료조건(3)
+        30~34   : 검증(4)
+                    큰 숫자, 작은 숫자 넣어보기
+
+  메모리 19 MB
+  시간 92 ms
+
+  회고
+    1. 슬라이싱의 끝판왕 3회독 진행하기
+    2. 180도 회전이 내가 맘 처럼 한 것처럼 안되서 시계 2번했음
+        new_dung[i][j] = dung[N - i - 1][M - j - 1] 이거임 i,j 안바뀐다!
+
+
 16 4
 10 20 30 40 50 60 70 80 10 20 30 40 50 60 70 80
 
-180도 회전이 내가 맘 처럼 한 것처럼 안되서 시계 2번했음
-180도 회전 확인하기
-new_dung[i][j] = dung[N - i - 1][M - j - 1] 이거임 i,j 안바뀐다!
 
 '''
 
@@ -107,7 +239,6 @@ while True:
     malgi()
     arr = new_arr
 print(time)
-
 
 '''
 # 백준 23291 어항정리

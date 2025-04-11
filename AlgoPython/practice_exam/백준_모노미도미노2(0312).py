@@ -1,4 +1,129 @@
 '''
+# 코드트리 2차원 테트리스
+2025.03.31.월
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 2회
+    문제 시작 16:50
+    1차 제출  17:16
+    문제 종료 17:19
+
+    총 풀이시간 29분
+        50~53   : 문제 이해, 손코딩(3)
+        53~56   : 탑다운 설계(3)
+        56~08   : location 설계(12)
+        08~09   : delete 설계(1)
+        09~10   : special 설계(1)
+        10~16   : 문제 예시 검증(6)
+        16      : 틀렸습니다!
+        16~19   : 틀린 테케 검증(3)
+                    어.. 두줄이 한번에 안지워짐 ㅠㅠ 디버깅 시작
+                    delete 함수에서 pop 할 때 앞에서부터 봐줘야하는데
+                    뒤에서부터 봐줘서 검사를 못했음!! 앞에서부터 보는 걸로 수정
+
+
+  메모리 23 MB
+  시간 226 ms
+
+  회고
+    1. 너 왜 검증안해 죽을래???????????????????????????????????????????????..............
+        N회차도 긴장해라.................
+
+'''
+
+
+block_num = int(input())
+m, n = 4, 6
+yel = [[0] * m for i in range(n)]
+red = [[0] * m for i in range(n)]
+sc = 0
+
+
+def location():
+    if shape == 1:
+        # 그냥 네모
+        nr = n - 1
+        for i in range(n):
+            if yel[i][c]:
+                nr = i - 1
+                break
+        yel[nr][c] = 1
+
+        nr = n - 1
+        for i in range(n):
+            if red[i][3 - r]:
+                nr = i - 1
+                break
+        red[nr][3 - r] = 1
+
+    elif shape == 2:
+        # 가로
+        nr = n - 1
+        for i in range(n):
+            if yel[i][c] or yel[i][c + 1]:
+                nr = i - 1
+                break
+        yel[nr][c] = yel[nr][c + 1] = 1
+
+        nr = n - 1
+        for i in range(n):
+            if red[i][3 - r]:
+                nr = i - 1
+                break
+        red[nr][3 - r] = red[nr - 1][3 - r] = 1
+
+    elif shape == 3:
+        # 세로
+        nr = n - 1
+        for i in range(n):
+            if yel[i][c]:
+                nr = i - 1
+                break
+        yel[nr][c] = yel[nr - 1][c] = 1
+
+        nr = n - 1
+        for i in range(n):
+            if red[i][3 - r] or red[i][3 - r - 1]:
+                nr = i - 1
+                break
+        red[nr][3 - r] = red[nr][3 - r - 1] = 1
+
+
+def delete(grid):
+    global sc
+    for i in range(n):
+        if grid[i].count(1) == 4:
+            sc += 1
+            grid.pop(i)
+            grid.insert(0, [0] * 4)
+
+
+def special(grid):
+    cnt = 0
+    for i in range(2):
+        if 1 in grid[i]:
+            cnt += 1
+    for _ in range(cnt):
+        grid.pop()
+        grid.insert(0, [0] * 4)
+
+
+for b in range(block_num):
+    shape, r, c = map(int, input().split())
+    location()  # 위치시키기
+    delete(yel)  # 한 줄 채워진 애들 지우기 + 점수
+    delete(red)
+    special(yel)
+    special(red)
+
+
+print(sc)
+print(sum(map(sum, red)) + sum(map(sum, yel)))
+
+
+
+'''
 # 20061 백준 새로운 게임2
 # 체감난이도 골2
 

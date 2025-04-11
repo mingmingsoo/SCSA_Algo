@@ -1,4 +1,84 @@
 '''
+# 코드트리 나무 타이쿤
+2025.04.03.목
+두번째 풀이 (특이사항: 백준은 시간초과나서 lst에서 set으로 코드 바꿈)
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 20:50
+    문제 종료 21:08
+    총 풀이시간 18분
+        50~59 : 문제 이해 및 초기 주석(9)
+        59~08 : 로직 작성(9)
+
+  메모리 18 MB
+  시간 100 ms
+  
+  회고
+  백준은 구름? 이라 문제 이해가 쉬웠던 것 같은데 오히려 코드트리 설명이 쩸 어려웠음
+  백준 제출시 시간초과라 SET으로 변경했는데 백준에 내보길 잘했다..
+    not in new_nu: 조회연산 때문인듯
+
+왤케 어후 설명이 어려워
+문제 설명
+    - 초기: 영양제 왼,아래에 4개 -> set
+    for 년수
+        1. 영양제 이동 (도넛)
+        2. 영양제 해당되는 애들 대각선 4방에 1 이상인 갯수만큼 성장(도넛X) -> new_grid 필요
+        3. 기존 set 제외하고 맵에서 2 이상인 애들 -2 하고 영양제 new_set 에 담아줌
+            set = new_set
+입력
+    맵 크기 n 총 년수 time
+    맵 정보
+    이동 규칙 d, l (방향 길이)
+출력
+    그리드 합
+'''
+
+n, time = map(int, input().split())
+grid = [list(map(int, input().split())) for i in range(n)]
+nutrition = set([(n - 1, 0), (n - 1, 1), (n - 2, 0), (n - 2, 1)])
+
+row = [0, -1, -1, -1, 0, 1, 1, 1]
+col = [-1, -1, 0, 1, 1, 1, 0, -1]
+
+for t in range(time):
+    d, l = map(int, input().split())
+    d -= 1
+    new_nu = set()
+    for r, c in nutrition:
+        nr = (r + row[d] * l) % n
+        nc = (c + col[d] * l) % n
+        grid[nr][nc] += 1
+        new_nu.add((nr, nc))
+    plus_grid = [[0] * n for i in range(n)]
+
+    for r, c in new_nu:
+        cnt = 0
+        for k in (1, 3, 5, 7):
+            nr = r + row[k]
+            nc = c + col[k]
+            if 0 <= nr < n and 0 <= nc < n and grid[nr][nc]:
+                cnt += 1
+        plus_grid[r][c] += cnt
+
+    for i in range(n):
+        for j in range(n):
+            if plus_grid[i][j]:
+                grid[i][j] += plus_grid[i][j]
+
+    new_nutrition = set()
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] >= 2 and (i, j) not in new_nu:
+                grid[i][j] -= 2
+                new_nutrition.add((i, j))
+
+    nutrition = new_nutrition
+
+print(sum(map(sum, grid)))
+
+'''
 # 백준 21610 마법사 상어와 비바라기 (코드트리 나무 타이쿤)
 
 # 문제 풀고 나서 기록

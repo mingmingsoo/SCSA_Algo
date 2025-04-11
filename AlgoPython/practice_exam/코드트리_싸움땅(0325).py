@@ -1,4 +1,155 @@
+n, pn, turn = map(int, input().split())
+tmp = [list(map(int, input().split())) for i in range(n)]
+grid = [[[] for i in range(n)] for i in range(n)]
+for i in range(n):
+    for j in range(n):
+        if tmp[i][j]:
+            grid[i][j].append(tmp[i][j])
+player_grid = [[0] * n for i in range(n)]
+player_lst = [0] * (pn + 1)
+
+for p in range(1, pn + 1):
+    r, c, d, s = map(int, input().split())
+    player_grid[r - 1][c - 1] = p
+    player_lst[p] = [r - 1, c - 1, d, s, 0]
+row = [-1, 0, 1, 0]
+col = [0, 1, 0, -1]
+score = [0] * (pn + 1)
+
+
+def battle(win_idx, lose_idx):
+    lr, lc, ld, ls, lg = player_lst[lose_idx]
+    if lg:
+        grid[lr][lc].append(lg)
+        lg = 0
+    for k in range(4):
+        nlr = lr + row[ld]
+        nlc = lc + col[ld]
+        if 0 <= nlr < n and 0 <= nlc < n and not player_grid[nlr][nlc]:
+            lr = nlr
+            lc = nlc
+            break
+        else:
+            ld = (ld + 1) % 4
+    if grid[lr][lc]:
+        other_gun = max(grid[lr][lc])
+        lg = other_gun
+        grid[lr][lc].remove(other_gun)
+    player_lst[lose_idx] = [lr, lc, ld, ls, lg]
+    player_grid[lr][lc] = lose_idx
+
+    wr, wc, wd, ws, wg = player_lst[win_idx]
+    if grid[wr][wc]:
+        other_gun = max(grid[nr][nc])
+        if other_gun > wg:
+            grid[nr][nc].remove(other_gun)
+            if wg:
+                grid[nr][nc].append(wg)
+            wg = other_gun
+    player_lst[win_idx] = [wr, wc, wd, ws, wg]
+    player_grid[wr][wc] = win_idx
+
+
+for t in range(turn):
+
+    for idx, player in enumerate(player_lst):
+        if idx == 0:
+            continue
+        r, c, d, s, gun = player
+        nr = r + row[d]
+        nc = c + col[d]
+        if not (0 <= nr < n and 0 <= nc < n):
+            d = (d + 2) % 4
+        nr = r + row[d]
+        nc = c + col[d]
+
+        if not player_grid[nr][nc]:  # 아무도 업송
+            player_grid[r][c] = 0
+            player_grid[nr][nc] = idx
+            if grid[nr][nc]:  # 총 이쓰면
+                other_gun = max(grid[nr][nc])
+                if other_gun > gun:
+                    grid[nr][nc].remove(other_gun)
+                    if gun:
+                        grid[nr][nc].append(gun)
+                    gun = other_gun
+            player_lst[idx] = [nr, nc, d, s, gun]
+
+        else:  # 쌈 떠
+            player_grid[r][c] = 0  # 빈 공간 만들어쥬공..
+            player_lst[idx] = [nr, nc, d, s, gun]  # 일단 갱신 해주공...
+            oidx = player_grid[nr][nc]
+            xr, xc, xd, xs, xgun = player_lst[oidx]  # 나랑 쌈 뜰애
+            win_idx, lose_idx = 0, 0
+            if s + gun > xs + xgun:
+                win_idx = idx
+                lose_idx = oidx
+            if s + gun == xs + xgun:
+                if s > xs:
+                    win_idx = idx
+                    lose_idx = oidx
+                else:
+                    win_idx = oidx
+                    lose_idx = idx
+            if s + gun < xs + xgun:
+                win_idx = oidx
+                lose_idx = idx
+            score[win_idx] += abs(s + gun - xs - xgun)
+            battle(win_idx, lose_idx)
+
+print(*score[1:])
+
+
 '''
+# 코드트리 싸움땅
+2025.04.05.토
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출횟수 2회
+    문제 시작 19:20
+    1차 제출  20:01
+    문제 종료 20:49
+
+    총 풀이시간 89분
+        20~30   : 문제이해 및 손코딩, 주석(7)
+        30~41   : 플레이어 이동 로직 - 싸움 안할 때
+        41~55   : 플레이어 이동 로직 - 싸움 할 때
+        55~01   : 2번 테케 안나와서 디버깅
+                    if other_gun > gun:
+                        if gun > 0:
+                            gun_grid[nr][nc].append(gun)
+                        gun_grid[nr][nc].remove(other_gun)
+                        gun = other_gun
+                        player_grid[nr][nc] = p
+                        player_lst[p] = [nr, nc, d, s, gun]
+
+                    이렇게 되어있는데, 이러면 내 총이 더 클 때는 플레이어가 이동을 안함!
+                    -> 들여쓰기 수정
+
+                    if other_gun > gun:
+                        if gun > 0:
+                            gun_grid[nr][nc].append(gun)
+                        gun_grid[nr][nc].remove(other_gun)
+                        gun = other_gun
+                    player_grid[nr][nc] = p
+                    player_lst[p] = [nr, nc, d, s, gun]
+        01~49   : 틀렸습니다!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 디버깅.............(48)
+                    플레이어가 벽만나서 방향 바꾸고, 싸움을 하게 됐을 때
+                    player_lst[p][2] = d
+                    바뀐 방향을 갱신안해줘서 틀렸음....................
+
+
+  메모리 18 MB
+  시간 91 ms
+
+  회고
+    1. 이렇게 틀려본거 정말 좋은 기회라고 생각합니다...
+        방향을 갱신 안해줘서 틀리다니!!!!!!!!!!!!!!!!!!!!!!!!!!! 리스트업 ...
+        !! 방향 바꾸고 리스트에 갱신 확실히 하기 !!
+
+
+# 문제 풀면서의 기록
 문제 설명
     1. 플레이어 순차 이동
     2. 플레이어 없으면 총먹어

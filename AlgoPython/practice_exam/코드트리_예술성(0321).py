@@ -1,4 +1,30 @@
 '''
+# 04.05.토 2회차 풀이
+# 코드트리 예술성
+
+# 문제 풀고 나서 기록
+
+    제출 횟수 1회
+    문제 시작 14:41
+    문제 종료 15:15
+    총 풀이시간 34분
+        41~50   : 문제 이해 및 손코딩(9)
+        50~54   : 맵 bfs 넘버링(4)
+        54~58   : 변 갯수 구하기(4)
+                    변 갯수 확인하다가 bfs에서 visited[][] = True 로 한거 발견하고
+                    visited[][] = num으로 변경
+        58~01   : 점수 계산 -> 구해놓은 dict들로(3)
+        01~13   : 회전(12)
+        13~15   : 검증(2)
+
+    메모리 19 MB
+    시간 107 ms
+
+    회고
+        1. 1차 풀이때는 변의 중복을 막고자 3차원 배열을 사용해서 벽을 만들었는데
+            중복으로 변 구하고 //2 하면 된다는 사실을 알게돼서 그렇게 진행했다 !!
+
+# 문제 풀면서의 기록
 변의 갯수 구하기
 '''
 from collections import deque, defaultdict
@@ -80,6 +106,7 @@ for t in range(4):
         score += (num_info[num1][1] + num_info[num2][1]) * num_info[num1][0] * num_info[num2][0] * face
     if t == 3:
         break
+
     # 회전
     # 1. 십자가 회전
     ro_grid = rotation(grid)
@@ -93,6 +120,7 @@ for t in range(4):
     srotation(s2, 0, n // 2 + 1)
     srotation(s3, n // 2 + 1, 0)
     srotation(s4, n // 2 + 1, n // 2 + 1)
+
     grid = ro_grid
 print(score)
 

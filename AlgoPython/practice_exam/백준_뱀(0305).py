@@ -1,4 +1,84 @@
 '''
+# 백준 뱀
+2025.04.07.월
+두번째 풀이
+
+# 문제 풀고 나서 기록
+    제출 횟수 1회
+    문제 시작 20:22
+    문제 종료 17:19
+
+    총 풀이시간 15분
+        22~28 : 문제 이해, 구상(6)
+        28~36 : 로직 작성(8)
+                1. 시간별 방향 pop 해줄거라 reverse 해줌
+                2. 머리는 좌표 r,c로 / 꼬리는 q로 관리
+        36~37 : 테케들 뱀 잘 이동하는지 확인(1)
+
+  메모리 113500 KB
+  시간 120 ms
+
+# 문제 풀면서의 기록
+머리 r,c 로 관리
+꼬리 q로 관리하고 사과 안먹으면 pop_left 0으로 바꾸고 머리넣고
+                사과 먹으면 pop 안함
+사과 1, 뱀 2 로 관리
+'''
+from collections import deque
+
+n = int(input())
+grid = [[0] * n for i in range(n)]
+an = int(input())
+for a in range(an):
+    ar, ac = map(int, input().split())
+    grid[ar - 1][ac - 1] = 1  # 사과
+dn = int(input())
+dir_lst = []
+for d in range(dn):
+    t, d = input().split()
+    dir_lst.append((int(t), d))
+dir_lst.reverse()
+r, c, d = 0, 0, 0
+q = deque([(0, 0)])
+grid[r][c] = 2
+row = [0, 1, 0, -1]
+col = [1, 0, -1, 0]
+time = 0
+ans = 0
+while True:
+    time += 1
+    nr = r + row[d]
+    nc = c + col[d]
+    if not (0 <= nr < n and 0 <= nc < n) or grid[nr][nc] == 2:
+        ans = time
+        break
+    if grid[nr][nc] == 1:  # 사과면 그냥 늘려!
+        grid[nr][nc] = 0
+        grid[nr][nc] = 2
+        r = nr
+        c = nc
+        q.append((r, c))
+    else:
+        # 사과 없으면 지워!
+        r = nr
+        c = nc
+        tr, tc = q.popleft()
+        grid[tr][tc] = 0
+        grid[r][c] = 2
+        q.append((r, c))
+    if dir_lst:
+        if dir_lst[-1][0] == time:
+            t, order = dir_lst.pop()
+            if order == "L":
+                d = (d - 1) % 4
+            else:
+                d = (d + 1) % 4
+
+print(ans)
+
+
+
+'''
 # 백준 3190 뱀
 
 # 문제 풀고 나서 기록

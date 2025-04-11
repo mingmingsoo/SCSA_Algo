@@ -1,4 +1,124 @@
 '''
+# 04.06.일 2회차 풀이
+# 코드트리 고대문명유적탐사
+
+# 문제 풀고 나서 기록
+
+    제출 횟수 1회
+    문제 시작 16:54
+    문제 종료 17:29
+    총 풀이시간 35분
+        54~00   : 문제 이해 및 손코딩(6)
+        00~08   : rotation 설계(8)
+        08~13   : bfs 설계(5)
+        13~20   : bfs에서 유물 좌표도 반환해야겠다 해서 수정(7)
+                    & 반환된 좌표 0으로 만들고 채우는 로직 작성
+        20~29   : 테케 답이 안나와서 디버깅(9)
+                    회전은 잘 됐는데, sort 해서 뽑아낸게 그 회전한 맵이 아니라 알아차렸음
+
+                    sel.append((-cnt, degree, c, r, grid))
+                    여기서 맵을 통쨰로 넣어주는데 깊은 복사가 안돼서 답이 안나왔었음! 수정!
+                    sel.append((-cnt, degree, c, r, [_[:] for _ in grid]))
+
+    메모리 22 MB
+    시간 166 ms
+
+    회고
+        1. 맞추고 나서 리팩토링 하다가 1회틀함 시험땐 정직히 짜자 ^^ 코드 짧은게 좋은게 아니다
+        2. 깊은 복사를 잊지마!
+
+# 문제 풀면서의 기록
+문제 설명
+    1. 격자 선택
+    2. bfs 진행 (while)
+'''
+from collections import deque
+
+n = 5
+turn, fn = map(int, input().split())
+grid = [list(map(int, input().split())) for i in range(n)]
+fill = list(map(int, input().split()))
+row = [-1, 1, 0, 0]
+col = [0, 0, 1, -1]
+
+
+def rotation(small_grid):
+    ro = [[0] * 3 for i in range(3)]
+    for i in range(3):
+        for j in range(3):
+            ro[i][j] = small_grid[3 - j - 1][i]
+    return ro
+
+
+def bfs():
+    total = 0
+    visited = [[False] * n for i in range(n)]
+    lo = []
+    for i in range(n):
+        for j in range(n):
+            if not visited[i][j]:
+                ele = 0
+                visited[i][j] = True
+                q = deque([(i, j)])
+                ele_lo = []
+                while q:
+                    qr, qc = q.popleft()
+                    ele_lo.append((qr, qc))
+                    ele += 1
+                    for k in range(4):
+                        nqr = qr + row[k]
+                        nqc = qc + col[k]
+                        if not (0 <= nqr < n and 0 <= nqc < n) or visited[nqr][nqc] or grid[nqr][nqc] != grid[i][j]:
+                            continue
+                        visited[nqr][nqc] = True
+                        q.append((nqr, nqc))
+                if ele >= 3:
+                    lo.extend(ele_lo)
+                    total += ele
+
+    return total, lo
+
+
+for t in range(turn):
+    ans = 0
+    sel = []
+
+    for r in range(3):
+        for c in range(3):
+            grid_origin = [_[:] for _ in grid]
+            for degree in range(90, 360, 90):
+                small_grid = [_[c:c + 3] for _ in grid[r:r + 3]]
+                ro = rotation(small_grid)
+                for i in range(3):
+                    for j in range(3):
+                        grid[i + r][j + c] = ro[i][j]
+                cnt, location = bfs()
+                if cnt:
+                    sel.append((-cnt, degree, c, r, [_[:] for _ in grid]))
+                small_grid = ro
+            grid = [_[:] for _ in grid_origin]
+
+    if not sel:
+        break
+    sel.sort()
+    score, degree, cc, rr, new_grid = sel[0]
+    grid = new_grid
+
+    while True:
+        cnt, location = bfs()
+        if cnt:
+            ans += cnt
+            for r, c in location:
+                grid[r][c] = 0
+        else:
+            break
+        for j in range(n):
+            for i in range(n - 1, -1, -1):
+                if not grid[i][j]:
+                    grid[i][j] = fill.pop(0)
+    print(ans, end=" ")
+
+'''
 # 체감난이도 골1
 
 # 문제 풀고 나서 기록
